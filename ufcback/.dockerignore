@@ -1,0 +1,15 @@
+.gradle
+build
+bin
+out
+.project
+.settings
+.classpath
+.factorypath
+.env
+Dockerfile
+.dockerignore
+.git
+.gitignore
+.vscode
+*.log
