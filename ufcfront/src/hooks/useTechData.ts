@@ -19,7 +19,7 @@ export type MetricType = 'marketShare' | 'starCount' | 'forkCount';
 
 export function useTechData(selectedCategory: string, period: Period, metric: MetricType = 'marketShare') {
   // 1. 전체 기술 목록 조회 (전역 캐싱)
-  const { data: techs = [] } = useQuery({
+  const { data: techs = [], isLoading: isTechsLoading } = useQuery({
     queryKey: ['techs'],
     queryFn: techApi.getAllTechs,
     staleTime: 1000 * 60 * 60,
@@ -99,6 +99,7 @@ export function useTechData(selectedCategory: string, period: Period, metric: Me
     techRankings,
     risingStars,
     labels,
-    isLoading: isStatsLoading
+    isTechsLoading,
+    isStatsLoading
   };
 }

@@ -11,6 +11,7 @@ import { useTechData, parseDate, MetricType } from '../hooks/useTechData';
 import { useTheme } from 'next-themes';
 import { getLogoUrl, getThemeColor } from '../lib/logoUtils';
 import { TypewriterText } from './TypewriterText';
+import { Skeleton, DashboardSkeleton } from './Skeleton';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -53,7 +54,8 @@ export default function DashboardContainer() {
     techRankings,
     risingStars,
     labels,
-    isLoading: loading
+    isTechsLoading,
+    isStatsLoading
   } = useTechData(selectedCategory, period, metric);
 
   const onToggleTech = (name: string) => {
@@ -167,11 +169,10 @@ export default function DashboardContainer() {
     }
   };
 
-  if (loading) return (
-    <div className="w-full h-screen flex items-center justify-center bg-background">
-      <div className="w-5 h-5 border-[1.5px] border-foreground/20 border-t-foreground/80 rounded-full animate-spin grayscale" />
-    </div>
-  );
+  // 초기 데이터가 아예 없을 때만 전체 스켈레톤 노출
+  if (isTechsLoading || (isStatsLoading && techs.length === 0)) {
+    return <DashboardSkeleton />;
+  }
 
   return (
     <div className="flex w-full h-dvh bg-background font-sans overflow-hidden relative">
@@ -293,7 +294,9 @@ export default function DashboardContainer() {
               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground mb-4 opacity-50 group-hover:opacity-100 transition-opacity">Dominant Tech</span>
               <div className="flex items-end justify-between">
                 <div className="flex items-center gap-4 group-hover:translate-x-1 transition-transform duration-500">
-                  {(() => {
+                  {isStatsLoading ? (
+                    <Skeleton className="h-10 w-32" />
+                  ) : (() => {
                     const topTechEntry = Object.entries(techRankings).find(([_, info]) => info.rank === 1);
                     const topTechName = topTechEntry?.[0] || '';
                     const topTech = techs.find(t => t.name === topTechName);
@@ -324,13 +327,17 @@ export default function DashboardContainer() {
             <div className="bg-background p-6 flex flex-col justify-between group transition-all duration-300">
               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground mb-4 opacity-50 group-hover:opacity-100 transition-opacity">Total Sector Scale</span>
               <div className="flex items-end justify-between">
-                <TypewriterText
-                  key={`scale-${selectedCategory}`}
-                  text={Array.from(new Set(stats.map(s => s.repoCount))).reduce((a, b) => a + b, 0).toLocaleString()}
-                  className="text-5xl font-medium tracking-tighter group-hover:translate-x-1 transition-transform duration-500"
-                  speed={50}
-                  delay={1.5}
-                />
+                {isStatsLoading ? (
+                  <Skeleton className="h-10 w-40" />
+                ) : (
+                  <TypewriterText
+                    key={`scale-${selectedCategory}`}
+                    text={Array.from(new Set(stats.map(s => s.repoCount))).reduce((a, b) => a + b, 0).toLocaleString()}
+                    className="text-5xl font-medium tracking-tighter group-hover:translate-x-1 transition-transform duration-500"
+                    speed={50}
+                    delay={1.5}
+                  />
+                )}
                 <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1 opacity-20">
                   ACTIVE REPOS
                 </div>
@@ -382,7 +389,11 @@ export default function DashboardContainer() {
             </div>
 
             <div className="flex-1 min-h-0 relative z-10">
-              {stats.length > 0 ? (
+              {isStatsLoading ? (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Skeleton className="w-full h-full" />
+                </div>
+              ) : stats.length > 0 ? (
                 <Line data={chartData} options={chartOptions} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase tracking-[0.4em] opacity-50">
