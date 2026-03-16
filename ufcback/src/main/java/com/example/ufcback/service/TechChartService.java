@@ -37,29 +37,35 @@ public class TechChartService {
         List<TechStats> categoryStats = techStatsRepository.findByTechCategoryAndCollectedAtAfter(targetTech.getCategory(), startDate);
         
         Map<LocalDateTime, Integer> totalRepoCountByDate = categoryStats.stream()
+                .filter(s -> s.getCollectedAt() != null)
                 .collect(Collectors.groupingBy(
                         s -> s.getCollectedAt().withMinute(0).withSecond(0).withNano(0),
-                        Collectors.summingInt(TechStats::getRepoCount)
+                        Collectors.summingInt(s -> s.getRepoCount() != null ? s.getRepoCount() : 0)
                 ));
         
         return targetStats.stream()
                 .map(stats -> {
+                    if (stats.getCollectedAt() == null || stats.getTech() == null) return null;
+                    
                     LocalDateTime truncatedTime = stats.getCollectedAt().withMinute(0).withSecond(0).withNano(0);
                     Integer totalInDate = totalRepoCountByDate.getOrDefault(truncatedTime, 0);
+                    Integer currentRepoCount = stats.getRepoCount() != null ? stats.getRepoCount() : 0;
+                    
                     Double share = (totalInDate > 0) 
-                            ? (double) stats.getRepoCount() / totalInDate * 100.0 
+                            ? (double) currentRepoCount / totalInDate * 100.0 
                             : 0.0;
                     
                     return TechStatsResponse.builder()
                             .techId(stats.getTech().getId())
                             .techName(stats.getTech().getName())
                             .collectedAt(stats.getCollectedAt())
-                            .starCount(stats.getStarCount())
-                            .forkCount(stats.getForkCount())
-                            .repoCount(stats.getRepoCount())
+                            .starCount(stats.getStarCount() != null ? stats.getStarCount() : 0)
+                            .forkCount(stats.getForkCount() != null ? stats.getForkCount() : 0)
+                            .repoCount(currentRepoCount)
                             .marketShare(Math.round(share * 100.0) / 100.0)
                             .build();
                 })
+                .filter(java.util.Objects::nonNull)
                 .toList();
     }
 
@@ -71,29 +77,35 @@ public class TechChartService {
         List<TechStats> categoryStats = techStatsRepository.findByTechCategoryAndCollectedAtAfter(category, startDate);
         
         Map<LocalDateTime, Integer> totalRepoCountByDate = categoryStats.stream()
+                .filter(s -> s.getCollectedAt() != null)
                 .collect(Collectors.groupingBy(
                         s -> s.getCollectedAt().withMinute(0).withSecond(0).withNano(0),
-                        Collectors.summingInt(TechStats::getRepoCount)
+                        Collectors.summingInt(s -> s.getRepoCount() != null ? s.getRepoCount() : 0)
                 ));
         
         return categoryStats.stream()
                 .map(stats -> {
+                    if (stats.getCollectedAt() == null || stats.getTech() == null) return null;
+
                     LocalDateTime truncatedTime = stats.getCollectedAt().withMinute(0).withSecond(0).withNano(0);
                     Integer totalInDate = totalRepoCountByDate.getOrDefault(truncatedTime, 0);
+                    Integer currentRepoCount = stats.getRepoCount() != null ? stats.getRepoCount() : 0;
+
                     Double share = (totalInDate > 0) 
-                            ? (double) stats.getRepoCount() / totalInDate * 100.0 
+                            ? (double) currentRepoCount / totalInDate * 100.0 
                             : 0.0;
-                    
+
                     return TechStatsResponse.builder()
                             .techId(stats.getTech().getId())
                             .techName(stats.getTech().getName())
                             .collectedAt(stats.getCollectedAt())
-                            .starCount(stats.getStarCount())
-                            .forkCount(stats.getForkCount())
-                            .repoCount(stats.getRepoCount())
+                            .starCount(stats.getStarCount() != null ? stats.getStarCount() : 0)
+                            .forkCount(stats.getForkCount() != null ? stats.getForkCount() : 0)
+                            .repoCount(currentRepoCount)
                             .marketShare(Math.round(share * 100.0) / 100.0)
                             .build();
                 })
+                .filter(java.util.Objects::nonNull)
                 .sorted(Comparator.comparing(TechStatsResponse::collectedAt)
                         .thenComparing(TechStatsResponse::techName))
                 .toList();

@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/techs")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
 public class TechListController {
 
     private final TechListRepository techListRepository;
