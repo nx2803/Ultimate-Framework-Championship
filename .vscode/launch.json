@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-UfcbackApplication<ufcback>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.ufcback.UfcbackApplication",
+            "projectName": "ufcback",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

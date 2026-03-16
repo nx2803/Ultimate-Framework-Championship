@@ -1,0 +1,77 @@
+spring:
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  mvc:
+    problemdetails:
+      enabled: true
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: ufc
+        format_sql: true
+
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      ssl:
+        enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: always
+    info:
+      enabled: true
+  info:
+    java:
+      enabled: true
+    os:
+      enabled: true
+
+logging:
+  pattern:
+    console: "%clr(%d{HH:mm:ss.SSS}){faint} %clr(%5p) %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n"
+  level:
+    org.springframework.batch: INFO
+    org.hibernate.SQL: DEBUG
+
+# GitHub API Configuration
+github:
+  api:
+    token: ${GITHUB_TOKEN}
+    base-url: https://api.github.com
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+
+# Git/Build Info
+info:
+  app:
+    name: ufc-backend
+    version: 0.0.1
+    java-version: 21
