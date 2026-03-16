@@ -7,7 +7,7 @@ import QueryClientProvider from '../components/providers/QueryClientProvider';
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  title: 'UFC - Universal Framework Collector',
+  title: 'UFC - Ultimate Framework Championship',
   description: 'Pure, Sophisticated Tech Trend Analysis',
 };
 
