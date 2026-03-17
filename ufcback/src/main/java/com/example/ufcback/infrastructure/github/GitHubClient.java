@@ -70,12 +70,17 @@ public class GitHubClient {
      * Note: language values with special chars (C#, C++) must be URL-encoded
      */
     public String getLanguageStats(String language) {
-        // C# → C%23, C++ → C%2B%2B 등 URL 인코딩 필요
-        String encodedLanguage;
-        try {
-            encodedLanguage = java.net.URLEncoder.encode(language, java.nio.charset.StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            encodedLanguage = language;
+        String encodedLanguage = language;
+        if (encodedLanguage.equalsIgnoreCase("C#")) {
+            encodedLanguage = "C%23";
+        } else if (encodedLanguage.equalsIgnoreCase("C++")) {
+            encodedLanguage = "C%2B%2B";
+        } else {
+            try {
+                encodedLanguage = java.net.URLEncoder.encode(language, java.nio.charset.StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                // fallback
+            }
         }
         var response = restClient.get()
                 .uri("/search/repositories?q=language:" + encodedLanguage + "&per_page=1")

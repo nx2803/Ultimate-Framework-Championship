@@ -19,4 +19,7 @@ public interface TechStatsRepository extends JpaRepository<TechStats, Long> {
 
     List<TechStats> findByCollectedAtAfter(LocalDateTime startDate);
     Optional<TechStats> findByTechIdAndCollectedAt(Long techId, LocalDateTime collectedAt);
+    
+    // 수집 실패 시 이전(가장 최근) 데이터를 가져오기 위한 메서드
+    Optional<TechStats> findFirstByTechIdOrderByCollectedAtDesc(Long techId);
 }

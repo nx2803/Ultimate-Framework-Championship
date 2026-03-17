@@ -43,6 +43,7 @@ public class CollectStatsBatchConfig {
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final TechListRepository techListRepository;
+    private final TechStatsRepository techStatsRepository;
     private final GitHubClient gitHubClient;
     private final ObjectMapper objectMapper;
     private final Semaphore githubThrottler = new Semaphore(1);
@@ -111,7 +112,9 @@ public class CollectStatsBatchConfig {
             try {
                 githubThrottler.acquire();
                 try {
-                    Thread.sleep(2500); // Search API 30회/분 한도 대비 여유 확보 (최대 24회/분)
+                    // Search API 30회/분 한도 (Primary/Search 2회 호출 시 기술당 2콜)
+                    // 기존 2.5초에서 3초로 보수적으로 늘려 GitHub의 엄격한 제한을 우회
+                    Thread.sleep(3000); 
                     log.info("Collecting stats for: {} (Repo: {}, Topic: {})",
                             tech.getName(), tech.getPrimaryRepo(), tech.getTopicKeyword());
 
@@ -137,8 +140,7 @@ public class CollectStatsBatchConfig {
                     if (tech.getTopicKeyword() != null && !tech.getTopicKeyword().isEmpty()) {
                         try {
                             // LANGUAGE 카테고리는 language: 쿼리 사용 (topic: 쿼리보다 정확하고 안정적)
-                            // 예: language:JavaScript → JS로 작성된 전체 레포 수
-                            // 기타 카테고리는 topic: 쿼리 사용 (예: topic:react)
+                            // 기타 카테고리는 topic: 쿼리 사용
                             boolean isLanguage = "LANGUAGE".equals(tech.getCategory());
                             String searchJson = isLanguage
                                     ? gitHubClient.getLanguageStats(tech.getTopicKeyword())
@@ -157,6 +159,21 @@ public class CollectStatsBatchConfig {
                         } catch (Exception e) {
                             log.error("Failed to get repo count for {} ({}): {}",
                                     tech.getName(), tech.getCategory(), e.getMessage());
+                        }
+                    }
+
+                    // Fallback: 만약 API 제한 등으로 인해 0이 수집되었다면 직전 성공 데이터를 재사용
+                    if (stars == 0 || forks == 0 || repoCount == 0) {
+                        try {
+                            TechStats lastStats = techStatsRepository.findFirstByTechIdOrderByCollectedAtDesc(tech.getId()).orElse(null);
+                            if (lastStats != null) {
+                                log.warn("Fallback applied for {}. Reusing last known stats.", tech.getName());
+                                stars = (stars == 0 && lastStats.getStarCount() != null) ? lastStats.getStarCount() : stars;
+                                forks = (forks == 0 && lastStats.getForkCount() != null) ? lastStats.getForkCount() : forks;
+                                repoCount = (repoCount == 0 && lastStats.getRepoCount() != null) ? lastStats.getRepoCount() : repoCount;
+                            }
+                        } catch (Exception e) {
+                            log.error("Failed to load fallback stats for {}", tech.getName(), e);
                         }
                     }
 
