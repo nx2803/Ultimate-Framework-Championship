@@ -158,7 +158,7 @@ export default function TechSidebar({
                           <div className="flex items-center gap-2">
                             {ranking && (
                               <span className={cn(
-                                "text-lg font-black italic tracking-tighter w-6 text-right leading-none transition-colors",
+                                "text-lg font-black tracking-tighter w-6 text-left leading-none transition-colors",
                                 isHovered || isSelected ? "text-foreground" : "text-muted-foreground/20"
                               )}>
                                 {ranking.rank}

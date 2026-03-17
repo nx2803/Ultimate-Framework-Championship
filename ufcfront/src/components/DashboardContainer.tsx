@@ -224,18 +224,18 @@ export default function DashboardContainer() {
           {/* Main Header / Title Section */}
           <header className="flex flex-col space-y-2 shrink-0">
             <div className="flex items-center gap-4 text-muted-foreground mb-4">
-              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-foreground/40">Category Analysis</span>
-              <div className="h-px flex-1 bg-green-400/30" />
-              <span className="text-[10px] font-mono opacity-30">{format(new Date(), 'yyyy-MM-dd HH:mm:ss')}</span>
+              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-foreground/40 shrink-0">C:\UFC\SYSTEM\ANALYSIS_MODULE</span>
+              <div className="h-px flex-1 bg-border/40" />
+              <span className="text-[10px] font-mono opacity-30 shrink-0">{format(new Date(), 'yyyy-MM-dd HH:mm:ss')}</span>
             </div>
 
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="flex-1 min-h-45 md:min-h-60 flex flex-col justify-start">
-                <div className="mb-4 md:mb-6">
+                <div className="mb-4 md:mb-6 flex items-baseline gap-2 md:gap-4">
                   <TypewriterText
                     key={selectedCategory}
                     text={selectedCategory}
-                    className="text-5xl md:text-8xl font-medium tracking-tighter text-foreground uppercase"
+                    className="text-5xl md:text-8xl font-black tracking-tighter text-foreground uppercase"
                     speed={80}
                   />
                 </div>
@@ -347,6 +347,12 @@ export default function DashboardContainer() {
 
           {/* Chart Section */}
           <div className="bg-background border border-border p-6 flex-1 min-h-100 flex flex-col gap-6 relative overflow-hidden group/chart rounded-sm">
+            {/* Chart Area Technical Metadata */}
+            <div className="absolute top-2 right-4 flex gap-4 text-[7px] font-mono opacity-20 pointer-events-none uppercase">
+              <span>REF_UUID: {Math.random().toString(16).substring(2, 10)}</span>
+              <span>COORDS: [40.7128, -74.0060] / LVL_SCALE: 1.0</span>
+            </div>
+
             <div className="absolute -top-12 -right-12 p-12 pointer-events-none opacity-[0.06] group-hover/chart:opacity-[0.15] transition-opacity duration-1000">
               <div className="text-[12rem] font-black tracking-tighter uppercase leading-none select-none">{selectedCategory}</div>
             </div>
@@ -357,7 +363,8 @@ export default function DashboardContainer() {
                   <span className="w-8 h-px bg-green-400" />
                   Dynamic Analysis
                 </h3>
-                <div className="flex border border-border p-0.5 bg-muted/10 rounded-sm self-start">
+                <div className="flex items-center border border-border p-0.5 bg-muted/10 rounded-sm self-start overflow-hidden">
+                  <span className="px-3 text-[7px] font-mono opacity-30 select-none uppercase border-r border-border/50 mr-0.5 mt-0.5">[SELECT_METRIC]:</span>
                   {(['marketShare', 'starCount', 'forkCount'] as MetricType[]).map((m) => (
                     <button
                       key={m}

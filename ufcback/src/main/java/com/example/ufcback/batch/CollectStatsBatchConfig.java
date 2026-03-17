@@ -7,7 +7,7 @@ import com.example.ufcback.infrastructure.github.dto.GitHubRepoItem;
 import com.example.ufcback.infrastructure.github.dto.GitHubSearchResponse;
 import com.example.ufcback.repository.TechListRepository;
 import com.example.ufcback.repository.TechStatsRepository;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.job.Job;
