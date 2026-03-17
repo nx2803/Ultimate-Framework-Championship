@@ -23,23 +23,38 @@ public class GitHubStatsScheduler {
     private final Job trendingScanJob;
 
     /**
-     * 수집 주기: 1시간마다 실행 (매 정각)
+     * TrendingScan: 매 정각 실행 (0분)
+     * Search API 1회 사용
      */
     @Scheduled(cron = "0 0 * * * *")
-    public void runDailyJobs() {
+    public void runTrendingScan() {
         try {
-            log.info("Starting Daily Jobs at {}", LocalDateTime.now());
-            
+            log.info("Starting TrendingScan at {}", LocalDateTime.now());
             JobParameters params = new JobParametersBuilder()
                     .addLocalDateTime("executedAt", LocalDateTime.now())
                     .toJobParameters();
-            
             jobLauncher.run(trendingScanJob, params);
-            jobLauncher.run(collectStatsJob, params);
-            
-            log.info("Successfully finished Daily Jobs");
+            log.info("TrendingScan finished");
         } catch (Exception e) {
-            log.error("Failed to run Daily Jobs: {}", e.getMessage());
+            log.error("Failed to run TrendingScan: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * CollectStats: 매 30분에 실행 (Search API ~75회 사용)
+     * TrendingScan과 30분 간격으로 엇갈려 실행해 Search API rate limit 충돌 방지
+     */
+    @Scheduled(cron = "0 30 * * * *")
+    public void runCollectStats() {
+        try {
+            log.info("Starting CollectStats at {}", LocalDateTime.now());
+            JobParameters params = new JobParametersBuilder()
+                    .addLocalDateTime("executedAt", LocalDateTime.now())
+                    .toJobParameters();
+            jobLauncher.run(collectStatsJob, params);
+            log.info("CollectStats finished");
+        } catch (Exception e) {
+            log.error("Failed to run CollectStats: {}", e.getMessage());
         }
     }
 }

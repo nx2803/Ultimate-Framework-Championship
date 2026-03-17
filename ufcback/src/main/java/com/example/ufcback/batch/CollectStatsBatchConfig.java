@@ -21,7 +21,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
-import org.springframework.batch.infrastructure.item.Chunk;
+
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.data.RepositoryItemReader;
@@ -111,7 +111,7 @@ public class CollectStatsBatchConfig {
             try {
                 githubThrottler.acquire();
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(2500); // Search API 30회/분 한도 대비 여유 확보 (최대 24회/분)
                     log.info("Collecting stats for: {} (Repo: {}, Topic: {})",
                             tech.getName(), tech.getPrimaryRepo(), tech.getTopicKeyword());
 
@@ -123,8 +123,10 @@ public class CollectStatsBatchConfig {
                             GitHubRepoItem repoItem = objectMapper.readValue(repoJson, GitHubRepoItem.class);
 
                             if (repoItem != null) {
-                                stars = repoItem.stargazersCount() != null ? repoItem.stargazersCount() : 0;
-                                forks = repoItem.forksCount() != null ? repoItem.forksCount() : 0;
+                                Integer s = repoItem.stargazersCount();
+                                Integer f = repoItem.forksCount();
+                                stars = (s != null) ? s : 0;
+                                forks = (f != null) ? f : 0;
                             }
                         } catch (Exception e) {
                             log.warn("Failed to get repo details for {}: {}", tech.getPrimaryRepo(), e.getMessage());

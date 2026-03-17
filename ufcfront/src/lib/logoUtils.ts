@@ -42,24 +42,86 @@ export function getLogoUrl(originalUrl: string | null | undefined, techName: str
 }
 
 /**
+ * HEX 색상의 상대 밝기(relative luminance, 0~1) 계산
+ * 0에 가까울수록 어둡고, 1에 가까울수록 밝음
+ */
+function getLuminance(hex: string): number {
+  const clean = hex.replace('#', '');
+  if (clean.length !== 6) return 0.5; // 파싱 불가 시 중간값
+
+  const r = parseInt(clean.slice(0, 2), 16) / 255;
+  const g = parseInt(clean.slice(2, 4), 16) / 255;
+  const b = parseInt(clean.slice(4, 6), 16) / 255;
+
+  // sRGB → linear 변환 후 luminance 계산 (WCAG 2.x standard)
+  const toLinear = (c: number) => c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+}
+
+/**
+ * 어두운 HEX 색상을 다크모드용으로 밝게 보정
+ * - 거의 검정(luminance < 0.01): 흰색으로 반환
+ * - 어두운 컬러(luminance < 0.08): HSL 밝기를 올려서 채도는 유지
+ */
+function lightenForDark(hex: string): string {
+  const clean = hex.replace('#', '');
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+
+  // RGB → HSL
+  const rn = r / 255, gn = g / 255, bn = b / 255;
+  const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+  const l = (max + min) / 2;
+  const d = max - min;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  let h = 0;
+  if (d !== 0) {
+    switch (max) {
+      case rn: h = ((gn - bn) / d) % 6; break;
+      case gn: h = (bn - rn) / d + 2; break;
+      case bn: h = (rn - gn) / d + 4; break;
+    }
+    h = Math.round(h * 60);
+    if (h < 0) h += 360;
+  }
+
+  // 밝기를 다크모드용으로 올림 (최소 60% 밝기 보장)
+  const newL = Math.max(l, 0.60);
+
+  // HSL → RGB
+  const c2 = (1 - Math.abs(2 * newL - 1)) * s;
+  const x = c2 * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = newL - c2 / 2;
+  let r2 = 0, g2 = 0, b2 = 0;
+  if      (h < 60)  { r2 = c2; g2 = x;  b2 = 0;  }
+  else if (h < 120) { r2 = x;  g2 = c2; b2 = 0;  }
+  else if (h < 180) { r2 = 0;  g2 = c2; b2 = x;  }
+  else if (h < 240) { r2 = 0;  g2 = x;  b2 = c2; }
+  else if (h < 300) { r2 = x;  g2 = 0;  b2 = c2; }
+  else              { r2 = c2; g2 = 0;  b2 = x;  }
+
+  const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+  return `#${toHex(r2)}${toHex(g2)}${toHex(b2)}`;
+}
+
+/**
  * 테마에 따른 최적화된 차트/UI 색상 반환
- * @param baseColor 기술의 기본 브랜드 색상 (HEX)
- * @param techName 기술 이름 (필요 시 보조 수단으로 사용)
- * @param theme 현재 테마 ('light' | 'dark')
+ * - 다크모드에서 어두운 색상(luminance < 0.08)을 자동으로 밝게 보정
+ * - Django #092E20, Elixir #4E275E, Prisma #2D3748, Expo #000020 등 포함
  */
 export function getThemeColor(baseColor: string, techName: string, theme: string | undefined): string {
   if (theme === 'dark') {
-    const lowerColor = baseColor.toLowerCase();
-    
-    // 검은색이거나 너무 어두운 회색인 경우에만 흰색으로 반전
-    const isBlackish = 
-      lowerColor === '#000000' || 
-      lowerColor === 'black' || 
-      lowerColor === '#1a1a1a' ||
-      lowerColor === '#111111';
-    
-    if (isBlackish) {
+    const luminance = getLuminance(baseColor);
+
+    if (luminance < 0.008) {
+      // 거의 완전한 검정 → 흰색으로
       return '#ffffff';
+    }
+
+    if (luminance < 0.08) {
+      // 어두운 컬러 → 채도 유지하면서 밝기만 올림
+      return lightenForDark(baseColor);
     }
   }
   return baseColor;

@@ -67,13 +67,21 @@ public class GitHubClient {
      * Language stats (total repository count written in a given language)
      * Use this for LANGUAGE category instead of getTopicStats()
      * e.g. language:JavaScript returns repos where JS is the primary language
+     * Note: language values with special chars (C#, C++) must be URL-encoded
      */
     public String getLanguageStats(String language) {
+        // C# → C%23, C++ → C%2B%2B 등 URL 인코딩 필요
+        String encodedLanguage;
+        try {
+            encodedLanguage = java.net.URLEncoder.encode(language, java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            encodedLanguage = language;
+        }
         var response = restClient.get()
-                .uri("/search/repositories?q=language:" + language + "&per_page=1")
+                .uri("/search/repositories?q=language:" + encodedLanguage + "&per_page=1")
                 .retrieve()
                 .toEntity(String.class);
-        
+
         logRateLimit(response.getHeaders());
         return response.getBody();
     }

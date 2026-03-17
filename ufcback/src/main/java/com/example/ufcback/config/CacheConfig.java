@@ -29,13 +29,19 @@ public class CacheConfig {
 
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(redisObjectMapper);
 
-        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+        RedisCacheConfiguration base = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofHours(1))
+                .disableCachingNullValues()  // null은 캐싱하지 않음
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
 
         return RedisCacheManager.builder(connectionFactory)
-                .cacheDefaults(config)
+                .cacheDefaults(base)
+                // CollectStats가 30분마다 실행 → 25분 TTL로 배치 후 항상 fresh 보장
+                .withCacheConfiguration("techStats",     base.entryTtl(Duration.ofMinutes(25)))
+                .withCacheConfiguration("categoryStats", base.entryTtl(Duration.ofMinutes(25)))
+                // techList는 드물게 변경 → 1시간 유지
+                .withCacheConfiguration("techList",      base.entryTtl(Duration.ofHours(1)))
                 .transactionAware()
                 .build();
     }

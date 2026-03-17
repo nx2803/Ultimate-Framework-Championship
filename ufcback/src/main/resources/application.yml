@@ -1,10 +1,16 @@
 server:
   port: ${PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain
+    min-response-size: 1024
 
 spring:
   threads:
     virtual:
       enabled: true
+  main:
+    lazy-initialization: true  # Bean을 사용 시점에 초기화 → 기동 속도 개선
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -15,13 +21,18 @@ spring:
       enabled: true
 
   jpa:
-    show-sql: true
+    show-sql: false  # 운영환경에서 SQL 로그 비활성화 (성능 및 로그 절감)
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         default_schema: ufc
-        format_sql: true
+        format_sql: false
+        default_batch_fetch_size: 100  # N+1 완화: IN 쿼리로 배치 로딩
+        jdbc:
+          batch_size: 50               # 배치 INSERT/UPDATE 성능 향상
+          order_inserts: true
+          order_updates: true
 
   batch:
     job:
