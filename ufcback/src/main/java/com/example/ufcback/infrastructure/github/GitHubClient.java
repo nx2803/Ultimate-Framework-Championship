@@ -52,10 +52,11 @@ public class GitHubClient {
 
     /**
      * Topic stats (total repository count for a given topic)
+     * 최소한의 퀄리티(의미 있는 프로젝트)를 위해 stars:>10 필터를 추가합니다.
      */
     public String getTopicStats(String topic) {
         var response = restClient.get()
-                .uri("/search/repositories?q=topic:" + topic + "&per_page=1")
+                .uri("/search/repositories?q={query}&per_page=1", "topic:" + topic + " stars:>10")
                 .retrieve()
                 .toEntity(String.class);
         
@@ -65,25 +66,12 @@ public class GitHubClient {
 
     /**
      * Language stats (total repository count written in a given language)
-     * Use this for LANGUAGE category instead of getTopicStats()
-     * e.g. language:JavaScript returns repos where JS is the primary language
-     * Note: language values with special chars (C#, C++) must be URL-encoded
+     * 최소한의 퀄리티(의미 있는 프로젝트)를 위해 stars:>10 필터를 추가합니다.
      */
     public String getLanguageStats(String language) {
-        String encodedLanguage = language;
-        if (encodedLanguage.equalsIgnoreCase("C#")) {
-            encodedLanguage = "C%23";
-        } else if (encodedLanguage.equalsIgnoreCase("C++")) {
-            encodedLanguage = "C%2B%2B";
-        } else {
-            try {
-                encodedLanguage = java.net.URLEncoder.encode(language, java.nio.charset.StandardCharsets.UTF_8);
-            } catch (Exception e) {
-                // fallback
-            }
-        }
+        // URI 템플릿 변수 사용으로 C# 등의 특수문자 및 공백 자동 인코딩 위임
         var response = restClient.get()
-                .uri("/search/repositories?q=language:" + encodedLanguage + "&per_page=1")
+                .uri("/search/repositories?q={query}&per_page=1", "language:" + language + " stars:>10")
                 .retrieve()
                 .toEntity(String.class);
 
