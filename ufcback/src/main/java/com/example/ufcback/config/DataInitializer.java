@@ -51,14 +51,14 @@ public class DataInitializer implements CommandLineRunner {
         saveTech("Go", "LANGUAGE", "go", "golang/go", "#00ADD8", "https://cdn.simpleicons.org/go");
         saveTech("Kotlin", "LANGUAGE", "kotlin", "jetBrains/kotlin", "#7F52FF", "https://cdn.simpleicons.org/kotlin");
         saveTech("Swift", "LANGUAGE", "swift", "apple/swift", "#F05138", "https://cdn.simpleicons.org/swift");
-        saveTech("C#", "LANGUAGE", "csharp", "dotnet/csharplang", "#239120", "https://cdn.simpleicons.org/csharp");
+        saveTech("C#", "LANGUAGE", "C#", "dotnet/csharplang", "#239120", "https://cdn.simpleicons.org/csharp");
         saveTech("PHP", "LANGUAGE", "php", "php/php-src", "#777BB4", "https://cdn.simpleicons.org/php");
         saveTech("Ruby", "LANGUAGE", "ruby", "ruby/ruby", "#CC342D", "https://cdn.simpleicons.org/ruby");
         saveTech("Dart", "LANGUAGE", "dart", "dart-lang/sdk", "#0175C2", "https://cdn.simpleicons.org/dart");
         saveTech("Scala", "LANGUAGE", "scala", "scala/scala", "#DC322F", "https://cdn.simpleicons.org/scala");
         saveTech("Elixir", "LANGUAGE", "elixir", "elixir-lang/elixir", "#4E275E", "https://cdn.simpleicons.org/elixir");
         saveTech("Zig", "LANGUAGE", "zig", "ziglang/zig", "#F7A41D", "https://cdn.simpleicons.org/zig");
-        saveTech("C++", "LANGUAGE", "cpp", "isocpp/cppcoreguidelines", "#00599C", "https://cdn.simpleicons.org/cplusplus");
+        saveTech("C++", "LANGUAGE", "C++", "isocpp/cppcoreguidelines", "#00599C", "https://cdn.simpleicons.org/cplusplus");
 
         // FRONTEND (12)
         saveTech("React", "FRONTEND", "react", "facebook/react", "#61DAFB", "https://cdn.simpleicons.org/react");

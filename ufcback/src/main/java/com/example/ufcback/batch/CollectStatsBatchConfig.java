@@ -134,15 +134,27 @@ public class CollectStatsBatchConfig {
                     Integer repoCount = 0;
                     if (tech.getTopicKeyword() != null && !tech.getTopicKeyword().isEmpty()) {
                         try {
-                            String topicJson = gitHubClient.getTopicStats(tech.getTopicKeyword());
-                            GitHubSearchResponse topicResponse = objectMapper.readValue(topicJson,
+                            // LANGUAGE 카테고리는 language: 쿼리 사용 (topic: 쿼리보다 정확하고 안정적)
+                            // 예: language:JavaScript → JS로 작성된 전체 레포 수
+                            // 기타 카테고리는 topic: 쿼리 사용 (예: topic:react)
+                            boolean isLanguage = "LANGUAGE".equals(tech.getCategory());
+                            String searchJson = isLanguage
+                                    ? gitHubClient.getLanguageStats(tech.getTopicKeyword())
+                                    : gitHubClient.getTopicStats(tech.getTopicKeyword());
+
+                            GitHubSearchResponse searchResponse = objectMapper.readValue(searchJson,
                                     GitHubSearchResponse.class);
 
-                            if (topicResponse != null && topicResponse.totalCount() != null) {
-                                repoCount = topicResponse.totalCount();
+                            if (searchResponse != null && searchResponse.totalCount() != null) {
+                                repoCount = searchResponse.totalCount();
+                                log.info("[{}] {} query='{}{}': {} repos",
+                                        tech.getCategory(), tech.getName(),
+                                        isLanguage ? "language:" : "topic:",
+                                        tech.getTopicKeyword(), repoCount);
                             }
                         } catch (Exception e) {
-                            log.warn("Failed to get topic stats for {}: {}", tech.getTopicKeyword(), e.getMessage());
+                            log.error("Failed to get repo count for {} ({}): {}",
+                                    tech.getName(), tech.getCategory(), e.getMessage());
                         }
                     }
 

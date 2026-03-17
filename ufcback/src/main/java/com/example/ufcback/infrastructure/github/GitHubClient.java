@@ -55,7 +55,22 @@ public class GitHubClient {
      */
     public String getTopicStats(String topic) {
         var response = restClient.get()
-                .uri("/search/repositories?q=topic:" + topic)
+                .uri("/search/repositories?q=topic:" + topic + "&per_page=1")
+                .retrieve()
+                .toEntity(String.class);
+        
+        logRateLimit(response.getHeaders());
+        return response.getBody();
+    }
+
+    /**
+     * Language stats (total repository count written in a given language)
+     * Use this for LANGUAGE category instead of getTopicStats()
+     * e.g. language:JavaScript returns repos where JS is the primary language
+     */
+    public String getLanguageStats(String language) {
+        var response = restClient.get()
+                .uri("/search/repositories?q=language:" + language + "&per_page=1")
                 .retrieve()
                 .toEntity(String.class);
         
