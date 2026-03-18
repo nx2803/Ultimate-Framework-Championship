@@ -194,10 +194,17 @@ export default function DashboardContainer() {
         backgroundColor: currentTechs.map((name, i) => {
           const techInfo = techs.find(t => t.name === name);
           const color = getThemeColor(techInfo?.color || colors[i % colors.length], name, theme);
-          return `${color}CC`; // High opacity for thin ring
+          if (hoveredTech && hoveredTech !== name) {
+            return `${color}22`; // 흐릿하게
+          }
+          return `${color}DD`; // 선명하게
         }),
-        borderWidth: 0,
-        hoverOffset: 12,
+        borderWidth: hoveredTech ? currentTechs.map(name => name === hoveredTech ? 2 : 0) : 0,
+        borderColor: currentTechs.map((name, i) => {
+          const techInfo = techs.find(t => t.name === name);
+          return getThemeColor(techInfo?.color || colors[i % colors.length], name, theme);
+        }),
+        hoverOffset: 0,
         spacing: 0,
         borderRadius: 0,
         cutout: '94%'
@@ -260,10 +267,10 @@ export default function DashboardContainer() {
       <AnimatePresence mode="wait">
         <motion.main
           key={selectedCategory}
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -5 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
           className="flex-1 p-4 md:p-8 flex flex-col gap-6 max-w-7xl mx-auto w-full overflow-y-auto lg:h-full lg:overflow-hidden"
         >
           {/* Mobile Header Toggle */}
@@ -274,14 +281,14 @@ export default function DashboardContainer() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="text-[10px] font-black tracking-widest uppercase opacity-40">UFC Census</div>
+            <div className="text-[10px] font-black tracking-widest uppercase">UFC Census</div>
           </div>
           {/* Main Header / Title Section */}
           <header className="flex flex-col space-y-2 shrink-0">
             <div className="flex items-center gap-4 text-muted-foreground mb-4">
-              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-foreground/40 shrink-0">C:\UFC\SYSTEM\ANALYSIS_MODULE</span>
-              <div className="h-px flex-1 bg-border/40" />
-              <span className="text-[10px] font-mono opacity-30 shrink-0">{format(new Date(), 'yyyy-MM-dd HH:mm:ss')}</span>
+              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-foreground shrink-0">C:\UFC\SYSTEM\ANALYSIS_MODULE</span>
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-[10px] font-mono shrink-0">{format(new Date(), 'yyyy-MM-dd HH:mm:ss')}</span>
             </div>
 
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
@@ -299,48 +306,67 @@ export default function DashboardContainer() {
                 </p>
               </div>
 
-              {/* Rising Stars Widget */}
-              {risingStars && risingStars.length > 0 && (
-                <div className="bg-background p-6 rounded-sm min-w-60 min-h-55 md:min-h-70 group/star-box transition-all duration-300 relative corner-frame">
-                  <CornerMarkers />
-                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3 flex items-center gap-2 relative z-10">
-                    <TrendingUp className="w-3 h-3 text-green-400" /> Rising Stars (7D)
-                  </h4>
-                  <div className="space-y-3">
-                    {risingStars.map((star, i) => {
-                      const starTech = techs.find(t => t.name === star.name);
-                      return (
-                        <div key={star.name} className="flex items-center justify-between gap-4 group/star">
-                          <div className="flex items-center gap-2.5">
-                            <span className="text-[9px] font-bold text-muted-foreground/30 w-3">{i + 1}</span>
-                            <div className="w-6 h-6 flex items-center justify-center overflow-hidden shrink-0">
-                              {starTech?.logoUrl ? (
-                                <img
-                                  src={getLogoUrl(starTech.logoUrl, star.name, theme)}
-                                  alt={star.name}
-                                  className="w-full h-full object-contain transition-all duration-300"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-foreground/5 rounded-full" />
-                              )}
+              {/* Rising Stars Widget — Always occupies space to prevent layout shift */}
+              <div className="min-w-64 md:min-w-72 min-h-55 md:min-h-70 relative shrink-0">
+                {risingStars && risingStars.length > 0 ? (
+                  <div className="bg-background p-6 rounded-sm h-full group/star-box transition-all duration-300 relative corner-frame">
+                    <CornerMarkers />
+                    <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3 flex items-center gap-2 relative z-10">
+                      <TrendingUp className="w-3 h-3 text-green-400" /> Rising Stars (7D)
+                    </h4>
+                    <div className="space-y-3">
+                      {risingStars.map((star, i) => {
+                        const starTech = techs.find(t => t.name === star.name);
+                        return (
+                          <div key={star.name} className="flex items-center justify-between gap-4 group/star">
+                            <div className="flex items-center gap-2.5">
+                              <span className="text-[9px] font-bold text-muted-foreground w-3">{i + 1}</span>
+                              <div className="w-6 h-6 flex items-center justify-center overflow-hidden shrink-0">
+                                {starTech?.logoUrl ? (
+                                  <img
+                                    src={getLogoUrl(starTech.logoUrl, star.name, theme)}
+                                    alt={star.name}
+                                    className="w-full h-full object-contain transition-all duration-300"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-foreground/5 rounded-full" />
+                                )}
+                              </div>
+                              <TypewriterText
+                                key={`star-${star.name}`}
+                                text={star.name}
+                                className="text-[11px] font-bold text-foreground tracking-tight"
+                                speed={30}
+                                delay={1.5 + (i * 0.1)}
+                              />
                             </div>
-                            <TypewriterText
-                              key={`star-${star.name}`}
-                              text={star.name}
-                              className="text-[11px] font-bold text-foreground/70 group-hover/star:text-foreground transition-colors tracking-tight"
-                              speed={30}
-                              delay={1.5 + (i * 0.1)}
-                            />
+                            <span className="text-green-500 font-mono font-bold text-[10px]">
+                              +{star.growth.toFixed(1)}%
+                            </span>
                           </div>
-                          <span className="text-green-500 font-mono font-bold text-[10px]">
-                            +{star.growth.toFixed(1)}%
-                          </span>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="bg-background/20 p-6 rounded-sm h-full flex flex-col gap-4 relative corner-frame overflow-hidden">
+                    <CornerMarkers />
+                    <div className="h-4 w-32 bg-foreground/5 animate-pulse rounded" />
+                    <div className="flex-1 flex flex-col gap-3">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className="flex items-center justify-between opacity-20">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 bg-foreground/10 rounded" />
+                            <div className="w-6 h-6 bg-foreground/10 rounded-full" />
+                            <div className="w-20 h-3 bg-foreground/10 rounded" />
+                          </div>
+                          <div className="w-8 h-3 bg-foreground/10 rounded" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </header>
 
@@ -348,7 +374,7 @@ export default function DashboardContainer() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 shrink-0 overflow-visible">
             <div className="bg-background p-6 flex flex-col justify-between group transition-all duration-300 relative corner-frame">
               <CornerMarkers />
-              <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground mb-4 opacity-50 group-hover:opacity-100 transition-opacity">Dominant Tech</span>
+              <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground mb-4">Dominant Tech</span>
               <div className="flex items-end justify-between">
                 <div className="flex items-center gap-4 group-hover:translate-x-1 transition-transform duration-500">
                   {isStatsLoading ? (
@@ -376,7 +402,7 @@ export default function DashboardContainer() {
                   })()}
                 </div>
                 <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-3 mb-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" /> <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1 opacity-20">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" /> <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1">
                     CHAMPION
                   </div>
                 </div>
@@ -385,7 +411,7 @@ export default function DashboardContainer() {
 
             <div className="bg-background p-6 flex flex-col justify-between group transition-all duration-300 relative corner-frame">
               <CornerMarkers />
-              <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground mb-4 opacity-50 group-hover:opacity-100 transition-opacity">Total Sector Scale</span>
+              <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground mb-4">Total Sector Scale</span>
               <div className="flex items-end justify-between">
                 {isStatsLoading ? (
                   <Skeleton className="h-10 w-40" />
@@ -398,7 +424,7 @@ export default function DashboardContainer() {
                     delay={1.5}
                   />
                 )}
-                <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1 opacity-20">
+                <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1">
                   ACTIVE REPOS
                 </div>
               </div>
@@ -416,7 +442,7 @@ export default function DashboardContainer() {
                   Dynamic Analysis
                 </h3>
                 <div className="flex items-center border border-border p-0.5 bg-muted/10 rounded-sm self-start overflow-hidden">
-                  <span className="px-3 text-[7px] font-mono opacity-30 select-none uppercase border-r border-border/50 mr-0.5 mt-0.5">[SELECT_METRIC]:</span>
+                  <span className="px-3 text-[7px] font-mono select-none uppercase border-r border-border/50 mr-0.5 mt-0.5">[SELECT_METRIC]:</span>
                   {(['marketShare', 'starCount', 'forkCount'] as MetricType[]).map((m) => (
                     <button
                       key={m}
@@ -523,7 +549,7 @@ export default function DashboardContainer() {
                     ) : (
                       <div className="w-full h-full flex flex-col md:flex-row items-center justify-between gap-10 py-4 px-6 relative overflow-hidden">
                         {/* Far Left Detail Panel */}
-                        <div className="hidden lg:flex flex-col gap-4 self-stretch justify-center opacity-20 hover:opacity-100 transition-opacity duration-500 select-none pointer-events-none">
+                        <div className="hidden lg:flex flex-col gap-4 self-stretch justify-center transition-opacity duration-500 select-none pointer-events-none">
                           <div className="flex flex-col gap-1">
                             <div className="w-12 h-0.5 bg-foreground/20" />
                             <span className="text-[6px] font-mono tracking-[0.2em]">NODE_ALPHA</span>
@@ -540,43 +566,53 @@ export default function DashboardContainer() {
                         {/* Thin Doughnut Container (Pushed Left) */}
                         <div className="relative w-full max-w-104 aspect-square flex items-center justify-center p-14 group/core">
                           {/* Corner Metadata (Technical Polish) */}
-                          <div className="absolute top-0 left-0 text-[6px] font-mono opacity-15 flex flex-col gap-1 uppercase select-none">
+                          <div className="absolute top-0 left-0 text-[6px] font-mono flex flex-col gap-1 uppercase select-none">
                             <span>System_ID: 0x88AF</span>
                             <span>Buffer_Load: Nominal</span>
                           </div>
-                          <div className="absolute bottom-4 right-0 text-[6px] font-mono opacity-15 flex flex-col items-end gap-1 uppercase select-none">
+                          <div className="absolute bottom-4 right-0 text-[6px] font-mono flex flex-col items-end gap-1 uppercase select-none">
                             <span>Sync_Active: 100%</span>
                             <span>Frame_Rate: 60Hz</span>
                           </div>
 
-                          {/* Angle Indicators (Surrounding the ring) */}
-                          <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[7px] font-mono opacity-20 select-none">000°</div>
-                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[7px] font-mono opacity-20 select-none">180°</div>
-                          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[7px] font-mono opacity-20 select-none">-90°</div>
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[7px] font-mono opacity-20 select-none">+090°</div>
 
-                          {/* Decorative Outer Rings */}
-                          <div className="absolute inset-4 border border-white/5 rounded-full scale-[1.08] opacity-20" />
-                          <div className="absolute inset-8 border border-white/10 rounded-full border-dashed animate-[spin_60s_linear_infinite] opacity-30" />
-                          <div className="absolute inset-0 rounded-full border border-white/5 animate-[pulse_10s_infinite]" />
+
 
                           <div className="w-full h-full relative z-10 drop-shadow-[0_0_40px_rgba(255,255,255,0.06)] group-hover/core:scale-[1.02] transition-transform duration-700">
                             <Doughnut data={pieData} options={pieOptions} />
                           </div>
 
-                          {/* Center Technical Readout (Aligned with the thin ring) */}
-                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mb-1">
+                          {/* Center Technical Readout — fixed layout, text-only changes */}
+                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-1">
+                            {/* 기술 이름 — 항상 같은 높이 차지 */}
+                            <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-muted-foreground select-none h-4 flex items-center">
+                              {hoveredTech && techRankings[hoveredTech] ? hoveredTech : ''}
+                            </span>
+                            {/* 숫자 — 항상 고정 */}
                             <div className="flex items-baseline gap-1">
-                              <span className="text-4xl font-black tracking-tighter tabular-nums leading-none select-none">100</span>
-                              <span className="text-[10px] font-bold opacity-30 mt-auto select-none">%</span>
+                              <span className="text-4xl font-black tracking-tighter tabular-nums leading-none select-none">
+                                {hoveredTech && techRankings[hoveredTech]
+                                  ? (metric === 'marketShare'
+                                    ? techRankings[hoveredTech].share.toFixed(1)
+                                    : techRankings[hoveredTech].share.toLocaleString())
+                                  : '100'}
+                              </span>
+                              <span className="text-[10px] font-bold mt-auto select-none">
+                                {metric === 'marketShare' ? '%' : ''}
+                              </span>
                             </div>
-                            <span className="text-[5px] font-mono opacity-20 mt-3 uppercase tracking-[1em] leading-none select-none translate-x-[0.5em]">Sector_Core</span>
+                            {/* 하단 레이블 — 항상 같은 높이 차지 */}
+                            <span className="text-[5px] font-mono uppercase tracking-[0.8em] leading-none select-none text-muted-foreground h-3 flex items-center">
+                              {hoveredTech && techRankings[hoveredTech]
+                                ? (metric === 'marketShare' ? 'Market_Share' : metric === 'starCount' ? 'Star_Count' : 'Fork_Count')
+                                : 'Sector_Core'}
+                            </span>
                           </div>
                         </div>
 
                         {/* Custom Technical Legend (Vertical Stream - Pushed Right) */}
                         <div className="flex-1 w-full max-w-md flex flex-col gap-4 border-l border-border/20 pl-12 overflow-y-auto max-h-80 pr-2 custom-scrollbar">
-                          <div className="flex items-center gap-3 mb-2 opacity-30">
+                          <div className="flex items-center gap-3 mb-2">
                             <div className="w-1 h-3 bg-foreground" />
                             <span className="text-[8px] font-mono font-bold tracking-[0.4em] uppercase">Sector_Analysis_Stream</span>
                           </div>
@@ -588,7 +624,7 @@ export default function DashboardContainer() {
                               <div key={name} className="flex flex-col gap-1.5 group/item cursor-crosshair">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-3">
-                                    <span className="text-[7px] font-mono opacity-20">{String(i + 1).padStart(2, '0')}</span>
+                                    <span className="text-[7px] font-mono">{String(i + 1).padStart(2, '0')}</span>
                                     <span className="text-[11px] font-bold tracking-tight text-foreground transition-all group-hover/item:translate-x-1">{name}</span>
                                   </div>
                                   <div className="flex items-center gap-4">
@@ -611,7 +647,7 @@ export default function DashboardContainer() {
                         </div>
 
                         {/* Far Right Detail Panel */}
-                        <div className="hidden lg:flex flex-col gap-4 self-stretch justify-center items-end opacity-20 hover:opacity-100 transition-opacity duration-500 select-none pointer-events-none">
+                        <div className="hidden lg:flex flex-col gap-4 self-stretch justify-center items-end transition-opacity duration-500 select-none pointer-events-none">
                           <div className="flex flex-col items-end gap-1">
                             <span className="text-[6px] font-mono tracking-[0.2em]">STREAM_SYNC</span>
                             <div className="w-12 h-0.5 bg-foreground/20" />
@@ -636,7 +672,7 @@ export default function DashboardContainer() {
               )}
             </div>
 
-            <div className="flex items-center justify-between text-[8px] font-mono text-muted-foreground tracking-[0.3em] uppercase opacity-30 border-t border-border/50 pt-4 shrink-0">
+            <div className="flex items-center justify-between text-[8px] font-mono text-muted-foreground tracking-[0.3em] uppercase border-t border-border pt-4 shrink-0">
               <span className="flex items-center gap-2"><div className="w-1 h-1 bg-green-400" /> Dynamic Data Analytics / Scale_Linear</span>
               <span className="flex items-center gap-4">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]" /> Live Feed

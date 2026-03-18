@@ -134,7 +134,7 @@ export default function TechSidebar({
           <div className="flex flex-col">
             <div className="flex items-center gap-2 mb-4 mt-2">
               <div className="w-1 h-3 bg-green-400" />
-              <p className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-[0.2em]">Ranking</p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Ranking</p>
             </div>
             <ul className="space-y-1">
               <AnimatePresence mode="popLayout">
@@ -168,7 +168,7 @@ export default function TechSidebar({
                             {ranking && (
                               <span className={cn(
                                 "text-lg font-medium tracking-tighter w-6 text-left leading-none transition-colors",
-                                isHovered || isSelected ? "text-foreground" : "text-muted-foreground/20"
+                                isHovered || isSelected ? "text-foreground" : "text-muted-foreground"
                               )}>
                                 {ranking.rank}
                               </span>
@@ -206,7 +206,7 @@ export default function TechSidebar({
                                     {ranking.rankDiff > 0 ? '▲' : '▼'}{Math.abs(ranking.rankDiff)}
                                   </span>
                                 )}
-                                <span className="opacity-30">SCORE</span>
+                                <span className="">SCORE</span>
                                 <span>{ranking.share.toLocaleString()}</span>
                               </div>
                             )}
@@ -238,13 +238,13 @@ export default function TechSidebar({
         <div className="flex flex-col">
           <TypewriterText
             text="UFC Collector"
-            className="text-[9px] font-bold uppercase tracking-[0.2em] text-foreground/40 text-balance"
+            className="text-[9px] font-bold uppercase tracking-[0.2em] text-foreground text-balance"
             speed={50}
             delay={2}
           />
           <TypewriterText
             text="v1.2.0-STABLE"
-            className="text-[8px] font-mono opacity-30 mt-1"
+            className="text-[8px] font-mono mt-1"
             speed={20}
             delay={2.5}
           />
