@@ -20,10 +20,10 @@ export const TypewriterText = ({ text, className, delay = 0, speed = 40, onCompl
   React.useEffect(() => {
     let timeout: NodeJS.Timeout;
     let currentIndex = 0;
-    
+
     setDisplayedText('');
     setIsCompleted(false);
-    
+
     const type = () => {
       if (currentIndex < text.length) {
         setDisplayedText(text.substring(0, currentIndex + 1));
@@ -36,7 +36,7 @@ export const TypewriterText = ({ text, className, delay = 0, speed = 40, onCompl
     };
 
     const startTimeout = setTimeout(type, delay * 1000);
-    
+
     return () => {
       clearTimeout(startTimeout);
       clearTimeout(timeout);
@@ -55,10 +55,10 @@ export const TypewriterText = ({ text, className, delay = 0, speed = 40, onCompl
     <div className={cn("block leading-tight", className)}>
       <span className="whitespace-pre-wrap relative">
         {text.split('').map((char, i) => (
-          <span 
-            key={i} 
+          <span
+            key={i}
             className={cn(
-              "relative", 
+              "relative",
               i < displayedText.length ? "text-current" : "text-transparent"
             )}
             aria-hidden={i >= displayedText.length}
@@ -68,7 +68,7 @@ export const TypewriterText = ({ text, className, delay = 0, speed = 40, onCompl
             {!isCompleted && i === displayedText.length - 1 && (
               <motion.span
                 animate={{ opacity: showCursor ? 1 : 0 }}
-                className="absolute left-[calc(100%+2px)] bottom-[0.1em] inline-block w-0.5 h-[0.9em] bg-green-400 shrink-0"
+                className="absolute left-[calc(100%+2px)] bottom-[0.1em] inline-block w-0.5 h-[0.9em] bg-green-500 shrink-0"
               />
             )}
           </span>
@@ -78,7 +78,7 @@ export const TypewriterText = ({ text, className, delay = 0, speed = 40, onCompl
         {!isCompleted && displayedText.length === 0 && (
           <motion.span
             animate={{ opacity: showCursor ? 1 : 0 }}
-            className="absolute left-0 bottom-[0.1em] inline-block w-0.5 h-[0.9em] bg-green-400"
+            className="absolute left-0 bottom-[0.1em] inline-block w-0.5 h-[0.9em] bg-green-500"
           />
         )}
       </span>

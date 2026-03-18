@@ -73,7 +73,7 @@ export default function TechSidebar({
 
   return (
     <aside className={cn(
-      "w-80 h-screen bg-background border-r border-border flex flex-col fixed lg:sticky top-0 z-50 lg:z-0 transition-transform duration-300 font-sans",
+      "w-80 h-screen bg-background flex flex-col fixed lg:sticky top-0 z-50 lg:z-0 transition-transform duration-300 font-sans",
       isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
     )}>
       <div className="p-8 border-b border-border flex items-center justify-between">
@@ -104,7 +104,7 @@ export default function TechSidebar({
           <input
             type="text"
             placeholder="Search Index..."
-            className="w-full h-10 bg-transparent border-b border-border rounded-none pl-7 pr-4 text-xs focus:outline-none focus:border-green-400/50 transition-all placeholder:text-muted-foreground/30 font-medium uppercase tracking-wider"
+            className="w-full h-10 bg-transparent border-b border-border rounded-none pl-7 pr-4 text-xs focus:outline-none focus:border-green-500/50 transition-all placeholder:text-muted-foreground/30 font-medium uppercase tracking-wider"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -119,7 +119,7 @@ export default function TechSidebar({
               className={cn(
                 "px-2 py-2 text-[8px] font-medium tracking-widest transition-all border uppercase",
                 selectedCategory === cat
-                  ? "bg-foreground text-background border-green-400 shadow-[0_0_20px_rgba(74,222,128,0.1)]"
+                  ? "bg-foreground text-background border-green-500 shadow-[0_0_20px_rgba(74,222,128,0.1)]"
                   : "bg-transparent text-muted-foreground border-border hover:border-muted-foreground"
               )}
             >
@@ -133,7 +133,7 @@ export default function TechSidebar({
         {filteredTechs.length > 0 ? (
           <div className="flex flex-col">
             <div className="flex items-center gap-2 mb-4 mt-2">
-              <div className="w-1 h-3 bg-green-400" />
+              <div className="w-1 h-3 bg-green-500" />
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Ranking</p>
             </div>
             <ul className="space-y-1">
@@ -189,11 +189,11 @@ export default function TechSidebar({
                           {/* Center: Name & Stats */}
                           <div className="flex flex-col">
                             <span className={cn("text-sm transition-all", isHovered || isSelected ? "font-medium tracking-tight" : "font-normal tracking-tight")}>
-                              <TypewriterText 
-                                key={`${tech.name}-${selectedCategory}`} 
-                                text={tech.name} 
-                                speed={40} 
-                                delay={0.1 * (i % 10)} 
+                              <TypewriterText
+                                key={`${tech.name}-${selectedCategory}`}
+                                text={tech.name}
+                                speed={40}
+                                delay={0.1 * (i % 10)}
                               />
                             </span>
                             {ranking && (
@@ -216,8 +216,8 @@ export default function TechSidebar({
                         {/* Right: Selection Checkbox */}
                         <div className={cn(
                           "w-3 h-3 border transition-all duration-300 shrink-0",
-                          isSelected 
-                            ? "bg-green-400 border-green-400 shadow-[0_0_10px_rgba(74,222,128,0.4)]" 
+                          isSelected
+                            ? "bg-green-500 border-green-500 shadow-[0_0_10px_rgba(74,222,128,0.4)]"
                             : "border-border group-hover:border-muted-foreground"
                         )} />
                       </button>

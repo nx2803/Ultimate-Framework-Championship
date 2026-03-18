@@ -312,7 +312,7 @@ export default function DashboardContainer() {
                   <div className="bg-background p-6 rounded-sm h-full group/star-box transition-all duration-300 relative corner-frame">
                     <CornerMarkers />
                     <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3 flex items-center gap-2 relative z-10">
-                      <TrendingUp className="w-3 h-3 text-green-400" /> Rising Stars (7D)
+                      <TrendingUp className="w-3 h-3 text-green-500" /> Rising Stars (7D)
                     </h4>
                     <div className="space-y-3">
                       {risingStars.map((star, i) => {
@@ -402,7 +402,7 @@ export default function DashboardContainer() {
                   })()}
                 </div>
                 <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-3 mb-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" /> <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-500" /> <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1">
                     CHAMPION
                   </div>
                 </div>
@@ -438,7 +438,7 @@ export default function DashboardContainer() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10 shrink-0">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                 <h3 className="text-[10px] font-medium uppercase tracking-[0.4em] text-foreground flex items-center gap-3">
-                  <span className="w-8 h-px bg-green-400" />
+                  <span className="w-8 h-px bg-green-500" />
                   Dynamic Analysis
                 </h3>
                 <div className="flex items-center border border-border p-0.5 bg-muted/10 rounded-sm self-start overflow-hidden">
@@ -613,7 +613,7 @@ export default function DashboardContainer() {
                         {/* Custom Technical Legend (Vertical Stream - Pushed Right) */}
                         <div className="flex-1 w-full max-w-md flex flex-col gap-4 border-l border-border/20 pl-12 overflow-y-auto max-h-80 pr-2 custom-scrollbar">
                           <div className="flex items-center gap-3 mb-2">
-                            <div className="w-1 h-3 bg-foreground" />
+                            <div className="w-1 h-3 bg-green-500" />
                             <span className="text-[8px] font-mono font-bold tracking-[0.4em] uppercase">Sector_Analysis_Stream</span>
                           </div>
                           {currentTechs.map((name, i) => {
@@ -673,9 +673,9 @@ export default function DashboardContainer() {
             </div>
 
             <div className="flex items-center justify-between text-[8px] font-mono text-muted-foreground tracking-[0.3em] uppercase border-t border-border pt-4 shrink-0">
-              <span className="flex items-center gap-2"><div className="w-1 h-1 bg-green-400" /> Dynamic Data Analytics / Scale_Linear</span>
+              <span className="flex items-center gap-2"><div className="w-1 h-1 bg-green-500" /> Dynamic Data Analytics / Scale_Linear</span>
               <span className="flex items-center gap-4">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]" /> Live Feed
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]" /> Live Feed
               </span>
             </div>
           </div>
