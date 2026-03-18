@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TechList } from '../types';
-import { Search, Hash, Cpu, Layout, Layers, Package, ChevronRight } from 'lucide-react';
+import { Search, Hash, Cpu, Layout, Layers, Package, ChevronRight, Github } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 import { useTheme } from 'next-themes';
@@ -235,13 +235,16 @@ export default function TechSidebar({
       </div>
 
       <div className="p-6 border-t border-border mt-auto bg-background/50 backdrop-blur-sm flex items-center justify-between">
-        <div className="flex flex-col">
-          <TypewriterText
-            text="UFC Collector"
-            className="text-[9px] font-bold uppercase tracking-[0.2em] text-foreground text-balance"
-            speed={50}
-            delay={2}
-          />
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <Github className="w-3 h-3 text-foreground" />
+            <TypewriterText
+              text="Powered by GitHub"
+              className="text-[9px] font-bold uppercase tracking-[0.2em] text-foreground text-balance"
+              speed={50}
+              delay={2}
+            />
+          </div>
           <TypewriterText
             text="v1.2.0-STABLE"
             className="text-[8px] font-mono mt-1"

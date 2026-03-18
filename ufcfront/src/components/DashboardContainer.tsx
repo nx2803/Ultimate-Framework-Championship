@@ -24,7 +24,7 @@ import {
   ArcElement,
   ChartOptions
 } from 'chart.js';
-import { TrendingUp, GitFork, AlertCircle, Calendar, ExternalLink, Menu, X, ChevronRight, BarChart3, PieChart as PieIcon, Activity } from 'lucide-react';
+import { TrendingUp, GitFork, AlertCircle, Calendar, ExternalLink, Menu, X, ChevronRight, BarChart3, PieChart as PieIcon, Activity, Trophy } from 'lucide-react';
 import { format } from 'date-fns';
 
 ChartJS.register(
@@ -401,8 +401,8 @@ export default function DashboardContainer() {
                     );
                   })()}
                 </div>
-                <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-3 mb-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500" /> <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1">
+                <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1">
+                  <Trophy className="w-3 h-3 text-foreground" /> <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1">
                     CHAMPION
                   </div>
                 </div>
@@ -460,7 +460,7 @@ export default function DashboardContainer() {
                         />
                       )}
                       <span className="relative z-10">
-                        {m === 'marketShare' ? 'Market' : m === 'starCount' ? 'Stars' : 'Forks'}
+                        {m === 'marketShare' ? 'Repos' : m === 'starCount' ? 'Stars' : 'Forks'}
                       </span>
                     </button>
                   ))}
