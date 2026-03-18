@@ -16,7 +16,7 @@
   --muted-foreground: #4a5059;
   --accent: #c4c4c4;
   --accent-foreground: #1a1c22;
-  --destructive: #cb2431;
+  --destructive: #destructive;
   --destructive-foreground: #ffffff;
   --border: #bdbdbd;
   --input: #bdbdbd;
@@ -123,4 +123,46 @@ body {
 
 [data-theme='dark'] .brand-logo {
   filter: brightness(0) invert(1);
+}
+
+/* Corner Marks (ㄱ자 디자인) */
+.corner-frame {
+  position: relative;
+}
+
+.corner-top-left, .corner-top-right, .corner-bottom-left, .corner-bottom-right {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.corner-top-left { 
+  top: -1px; 
+  left: -1px; 
+  border-top: 1.5px solid currentColor; 
+  border-left: 1.5px solid currentColor; 
+  opacity: 0.8; 
+}
+.corner-top-right { 
+  top: -1px; 
+  right: -1px; 
+  border-top: 1.5px solid currentColor; 
+  border-right: 1.5px solid currentColor; 
+  opacity: 0.8; 
+}
+.corner-bottom-left { 
+  bottom: -1px; 
+  left: -1px; 
+  border-bottom: 1.5px solid currentColor; 
+  border-left: 1.5px solid currentColor; 
+  opacity: 0.8; 
+}
+.corner-bottom-right { 
+  bottom: -1px; 
+  right: -1px; 
+  border-bottom: 1.5px solid currentColor; 
+  border-right: 1.5px solid currentColor; 
+  opacity: 0.8; 
 }

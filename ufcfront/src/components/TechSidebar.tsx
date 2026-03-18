@@ -10,6 +10,15 @@ import { useTheme } from 'next-themes';
 import { getLogoUrl } from '../lib/logoUtils';
 import { TypewriterText } from './TypewriterText';
 
+const CornerMarkers = () => (
+  <>
+    <div className="corner-top-left" />
+    <div className="corner-top-right" />
+    <div className="corner-bottom-left" />
+    <div className="corner-bottom-right" />
+  </>
+);
+
 interface TechSidebarProps {
   techs: TechList[];
   selectedCategory: string;

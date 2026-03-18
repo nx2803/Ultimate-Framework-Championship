@@ -270,7 +270,7 @@ export default function DashboardContainer() {
           <div className="lg:hidden flex items-center justify-between mb-2">
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="p-2 border border-border rounded-sm bg-background text-foreground"
+              className="p-2 rounded-sm bg-background text-foreground"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -301,8 +301,9 @@ export default function DashboardContainer() {
 
               {/* Rising Stars Widget */}
               {risingStars && risingStars.length > 0 && (
-                <div className="bg-background border border-border p-6 rounded-sm min-w-60 min-h-55 md:min-h-70 group/star-box transition-all duration-300">
-                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3 flex items-center gap-2">
+                <div className="bg-background p-6 rounded-sm min-w-60 min-h-55 md:min-h-70 group/star-box transition-all duration-300 relative corner-frame">
+                  <CornerMarkers />
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3 flex items-center gap-2 relative z-10">
                     <TrendingUp className="w-3 h-3 text-green-400" /> Rising Stars (7D)
                   </h4>
                   <div className="space-y-3">
@@ -344,7 +345,7 @@ export default function DashboardContainer() {
           </header>
 
           {/* Highlight Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border/40 shrink-0 overflow-hidden border border-border/50 rounded-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 shrink-0 overflow-visible">
             <div className="bg-background p-6 flex flex-col justify-between group transition-all duration-300 relative corner-frame">
               <CornerMarkers />
               <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground mb-4 opacity-50 group-hover:opacity-100 transition-opacity">Dominant Tech</span>
@@ -405,7 +406,7 @@ export default function DashboardContainer() {
           </div>
 
           {/* Chart Section */}
-          <div className="bg-background border border-border p-6 flex-1 min-h-100 flex flex-col gap-6 relative overflow-hidden group/chart rounded-sm corner-frame">
+          <div className="bg-background p-6 flex-1 min-h-[400px] flex flex-col gap-6 relative group/chart rounded-sm corner-frame">
             <CornerMarkers />
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10 shrink-0">
