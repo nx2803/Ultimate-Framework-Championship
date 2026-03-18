@@ -6,7 +6,6 @@ import { TechList, TechStats, Period } from '../types';
 import { techApi } from '../lib/api';
 import TechSidebar from './TechSidebar';
 import { cn } from '../lib/utils';
-import { Line } from 'react-chartjs-2';
 import { useTechData, parseDate, MetricType } from '../hooks/useTechData';
 import { useTheme } from 'next-themes';
 import { getLogoUrl, getThemeColor } from '../lib/logoUtils';
@@ -22,9 +21,10 @@ import {
   Tooltip,
   Legend,
   Filler,
+  ArcElement,
   ChartOptions
 } from 'chart.js';
-import { TrendingUp, GitFork, AlertCircle, Calendar, ExternalLink, Menu, X, ChevronRight } from 'lucide-react';
+import { TrendingUp, GitFork, AlertCircle, Calendar, ExternalLink, Menu, X, ChevronRight, BarChart3, PieChart as PieIcon, Activity } from 'lucide-react';
 import { format } from 'date-fns';
 
 ChartJS.register(
@@ -35,8 +35,11 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  ArcElement
 );
+
+import { Line, Doughnut } from 'react-chartjs-2';
 
 export default function DashboardContainer() {
   const [selectedCategory, setSelectedCategory] = useState<string>('LANGUAGE');
@@ -45,6 +48,7 @@ export default function DashboardContainer() {
   const [hoveredTech, setHoveredTech] = useState<string | null>(null);
   const [selectedTechNames, setSelectedTechNames] = useState<string[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [chartType, setChartType] = useState<'line' | 'pie'>('pie');
   const { theme } = useTheme();
 
   const {
@@ -169,6 +173,48 @@ export default function DashboardContainer() {
     }
   };
 
+  const currentTechs = Object.keys(techRankings)
+    .filter(name => selectedTechNames.length === 0 || selectedTechNames.includes(name))
+    .sort((a, b) => techRankings[b].share - techRankings[a].share);
+
+  const pieData = {
+    labels: currentTechs,
+    datasets: [
+      {
+        data: currentTechs.map(name => techRankings[name].share),
+        backgroundColor: currentTechs.map((name, i) => {
+          const techInfo = techs.find(t => t.name === name);
+          const color = getThemeColor(techInfo?.color || colors[i % colors.length], name, theme);
+          return `${color}CC`; // High opacity for thin ring
+        }),
+        borderWidth: 0,
+        hoverOffset: 12,
+        spacing: 0,
+        borderRadius: 0,
+        cutout: '94%'
+      }
+    ]
+  };
+
+  const pieOptions: ChartOptions<'doughnut'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '90%',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0a0a0a',
+        padding: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        cornerRadius: 0,
+        callbacks: {
+          label: (item: any) => ` ${item.label}: ${item.formattedValue}${metric === 'marketShare' ? '%' : ''}`
+        }
+      }
+    }
+  };
+
   // 초기 데이터가 아예 없을 때만 전체 스켈레톤 노출
   if (isTechsLoading || (isStatsLoading && techs.length === 0)) {
     return <DashboardSkeleton />;
@@ -246,7 +292,7 @@ export default function DashboardContainer() {
 
               {/* Rising Stars Widget */}
               {risingStars && risingStars.length > 0 && (
-                <div className="bg-accent/30 border border-border/50 p-4 md:p-5 rounded-sm min-w-60 min-h-55 md:min-h-70">
+                <div className="bg-background border border-border p-6 rounded-sm min-w-60 min-h-55 md:min-h-70 group/star-box transition-all duration-300">
                   <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3 flex items-center gap-2">
                     <TrendingUp className="w-3 h-3 text-green-400" /> Rising Stars (7D)
                   </h4>
@@ -379,29 +425,172 @@ export default function DashboardContainer() {
                   ))}
                 </div>
               </div>
-              <div className="flex border border-border p-0.5 bg-muted/20 rounded-sm self-start sm:self-auto">
-                {[7, 30, 90].map((p) => (
+              <div className="flex gap-2">
+                {chartType === 'line' && (
+                  <div className="hidden sm:flex border border-border p-0.5 bg-muted/20 rounded-sm">
+                    {[7, 30, 90].map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setPeriod(p as Period)}
+                        className={cn(
+                          "px-4 md:px-8 py-1.5 md:py-2 text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 rounded-sm",
+                          period === p ? "bg-foreground text-background shadow-lg" : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                        )}
+                      >
+                        {p}D
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="flex border border-border p-0.5 bg-muted/20 rounded-sm shrink-0">
                   <button
-                    key={p}
-                    onClick={() => setPeriod(p as Period)}
+                    onClick={() => setChartType('line')}
                     className={cn(
-                      "px-4 md:px-8 py-1.5 md:py-2 text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 rounded-sm",
-                      period === p ? "bg-foreground text-background shadow-lg" : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                      "p-1.5 transition-all duration-300 rounded-sm",
+                      chartType === 'line' ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted/30"
                     )}
                   >
-                    {p}D
+                    <BarChart3 className={cn("w-4 h-4", chartType === 'line' ? "opacity-100" : "opacity-40")} />
                   </button>
-                ))}
+                  <button
+                    onClick={() => setChartType('pie')}
+                    className={cn(
+                      "p-1.5 transition-all duration-300 rounded-sm",
+                      chartType === 'pie' ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted/30"
+                    )}
+                  >
+                    <PieIcon className={cn("w-4 h-4", chartType === 'pie' ? "opacity-100" : "opacity-40")} />
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="flex-1 min-h-0 relative z-10">
+            <div className="flex-1 min-h-0 relative z-10 py-4">
               {isStatsLoading ? (
                 <div className="w-full h-full flex items-center justify-center">
                   <Skeleton className="w-full h-full" />
                 </div>
               ) : stats.length > 0 ? (
-                <Line data={chartData} options={chartOptions} />
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={chartType}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.02 }}
+                    transition={{ duration: 0.4 }}
+                    className="w-full h-full"
+                  >
+                    {chartType === 'line' ? (
+                      <Line data={chartData} options={chartOptions} />
+                    ) : (
+                      <div className="w-full h-full flex flex-col md:flex-row items-center justify-between gap-10 py-4 px-6 relative overflow-hidden">
+                        {/* Far Left Detail Panel */}
+                        <div className="hidden lg:flex flex-col gap-4 self-stretch justify-center opacity-20 hover:opacity-100 transition-opacity duration-500 select-none pointer-events-none">
+                          <div className="flex flex-col gap-1">
+                            <div className="w-12 h-0.5 bg-foreground/20" />
+                            <span className="text-[6px] font-mono tracking-[0.2em]">NODE_ALPHA</span>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <div className="w-8 h-0.5 bg-foreground/20" />
+                            <span className="text-[6px] font-mono tracking-[0.2em]">LATENCY: 12ms</span>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <div className="w-16 h-0.5 bg-foreground/20" />
+                            <span className="text-[6px] font-mono tracking-[0.2em]">PKT_LOSS: 0.00%</span>
+                          </div>
+                        </div>
+                        {/* Thin Doughnut Container (Pushed Left) */}
+                        <div className="relative w-full max-w-104 aspect-square flex items-center justify-center p-14 group/core">
+                          {/* Corner Metadata (Technical Polish) */}
+                          <div className="absolute top-0 left-0 text-[6px] font-mono opacity-15 flex flex-col gap-1 uppercase select-none">
+                            <span>System_ID: 0x88AF</span>
+                            <span>Buffer_Load: Nominal</span>
+                          </div>
+                          <div className="absolute bottom-4 right-0 text-[6px] font-mono opacity-15 flex flex-col items-end gap-1 uppercase select-none">
+                            <span>Sync_Active: 100%</span>
+                            <span>Frame_Rate: 60Hz</span>
+                          </div>
+
+                          {/* Angle Indicators (Surrounding the ring) */}
+                          <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[7px] font-mono opacity-20 select-none">000°</div>
+                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[7px] font-mono opacity-20 select-none">180°</div>
+                          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[7px] font-mono opacity-20 select-none">-90°</div>
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[7px] font-mono opacity-20 select-none">+090°</div>
+
+                          {/* Decorative Outer Rings */}
+                          <div className="absolute inset-4 border border-white/5 rounded-full scale-[1.08] opacity-20" />
+                          <div className="absolute inset-8 border border-white/10 rounded-full border-dashed animate-[spin_60s_linear_infinite] opacity-30" />
+                          <div className="absolute inset-0 rounded-full border border-white/5 animate-[pulse_10s_infinite]" />
+
+                          <div className="w-full h-full relative z-10 drop-shadow-[0_0_40px_rgba(255,255,255,0.06)] group-hover/core:scale-[1.02] transition-transform duration-700">
+                            <Doughnut data={pieData} options={pieOptions} />
+                          </div>
+
+                          {/* Center Technical Readout (Aligned with the thin ring) */}
+                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mb-1">
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-4xl font-black tracking-tighter tabular-nums leading-none select-none">100</span>
+                              <span className="text-[10px] font-bold opacity-30 mt-auto select-none">%</span>
+                            </div>
+                            <span className="text-[5px] font-mono opacity-20 mt-3 uppercase tracking-[1em] leading-none select-none translate-x-[0.5em]">Sector_Core</span>
+                          </div>
+                        </div>
+
+                        {/* Custom Technical Legend (Vertical Stream - Pushed Right) */}
+                        <div className="flex-1 w-full max-w-md flex flex-col gap-4 border-l border-border/20 pl-12 overflow-y-auto max-h-80 pr-2 custom-scrollbar">
+                          <div className="flex items-center gap-3 mb-2 opacity-30">
+                            <div className="w-1 h-3 bg-foreground" />
+                            <span className="text-[8px] font-mono font-bold tracking-[0.4em] uppercase">Sector_Analysis_Stream</span>
+                          </div>
+                          {currentTechs.map((name, i) => {
+                            const techInfo = techs.find(t => t.name === name);
+                            const color = getThemeColor(techInfo?.color || colors[i % colors.length], name, theme);
+                            const val = techRankings[name].share;
+                            return (
+                              <div key={name} className="flex flex-col gap-1.5 group/item cursor-crosshair">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-[7px] font-mono opacity-20">{String(i + 1).padStart(2, '0')}</span>
+                                    <span className="text-[11px] font-bold tracking-tight text-foreground transition-all group-hover/item:translate-x-1">{name}</span>
+                                  </div>
+                                  <div className="flex items-center gap-4">
+                                    <span className="text-[10px] font-mono font-black" style={{ color }}>{val.toFixed(2)}{metric === 'marketShare' ? '%' : ''}</span>
+                                    <div className="w-1 h-1 rounded-full bg-foreground/10 group-hover/item:bg-white animate-pulse" />
+                                  </div>
+                                </div>
+                                <div className="w-full h-0.5 bg-muted/10 rounded-full overflow-hidden relative">
+                                  <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${(val / (metric === 'marketShare' ? 100 : Math.max(...currentTechs.map(n => techRankings[n].share)))) * 100}%` }}
+                                    className="h-full relative z-10"
+                                    style={{ backgroundColor: color }}
+                                  />
+                                  <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent animate-[shimmer_2s_infinite]" />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Far Right Detail Panel */}
+                        <div className="hidden lg:flex flex-col gap-4 self-stretch justify-center items-end opacity-20 hover:opacity-100 transition-opacity duration-500 select-none pointer-events-none">
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="text-[6px] font-mono tracking-[0.2em]">STREAM_SYNC</span>
+                            <div className="w-12 h-0.5 bg-foreground/20" />
+                          </div>
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="text-[6px] font-mono tracking-[0.2em]">ENCRYPT: AES-256</span>
+                            <div className="w-16 h-0.5 bg-foreground/20" />
+                          </div>
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="text-[6px] font-mono tracking-[0.2em]">UPLINK: ACTIVE</span>
+                            <div className="w-10 h-0.5 bg-foreground/20" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase tracking-[0.4em] opacity-50">
                   Aggregating Global Stream...

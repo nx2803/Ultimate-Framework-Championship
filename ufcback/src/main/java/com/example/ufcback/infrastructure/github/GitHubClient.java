@@ -86,6 +86,9 @@ public class GitHubClient {
         var response = restClient.get()
                 .uri("/repos/" + ownerRepo)
                 .retrieve()
+                .onStatus(status -> status.isError(), (request, resp) -> {
+                    System.err.println("GitHub API Error for " + ownerRepo + ": " + resp.getStatusCode());
+                })
                 .toEntity(String.class);
         
         logRateLimit(response.getHeaders());

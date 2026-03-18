@@ -114,7 +114,7 @@ export default function TechSidebar({
                   : "bg-transparent text-muted-foreground border-border hover:border-muted-foreground"
               )}
             >
-              {cat}
+              <TypewriterText key={cat} text={cat} speed={40} delay={0.2} />
             </button>
           ))}
         </div>
@@ -129,7 +129,7 @@ export default function TechSidebar({
             </div>
             <ul className="space-y-1">
               <AnimatePresence mode="popLayout">
-                {filteredTechs.map((tech) => {
+                {filteredTechs.map((tech, i) => {
                   const ranking = techRankings?.[tech.name];
                   const isHovered = hoveredTech === tech.name;
                   const isSelected = selectedTechNames.includes(tech.name);
@@ -180,7 +180,12 @@ export default function TechSidebar({
                           {/* Center: Name & Stats */}
                           <div className="flex flex-col">
                             <span className={cn("text-sm transition-all", isHovered || isSelected ? "font-bold tracking-tight" : "font-medium tracking-tight")}>
-                              {tech.name}
+                              <TypewriterText 
+                                key={`${tech.name}-${selectedCategory}`} 
+                                text={tech.name} 
+                                speed={40} 
+                                delay={0.1 * (i % 10)} 
+                              />
                             </span>
                             {ranking && (
                               <div className="flex items-center gap-2 text-[9px] font-mono text-muted-foreground">
