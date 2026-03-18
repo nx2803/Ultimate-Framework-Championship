@@ -28,6 +28,7 @@ import org.springframework.batch.infrastructure.item.data.RepositoryItemReader;
 import org.springframework.batch.infrastructure.item.data.builder.RepositoryItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -54,6 +55,7 @@ public class CollectStatsBatchConfig {
      * 격리 수준을 ISOLATION_READ_COMMITTED로 설정하여 공통 메타데이터 테이블 업데이트 충돌을 방지합니다.
      */
     @Bean
+    @Primary
     public JobRepository jobRepository() throws Exception {
         org.springframework.batch.core.repository.support.JobRepositoryFactoryBean factory = new org.springframework.batch.core.repository.support.JobRepositoryFactoryBean();
         factory.setDataSource(dataSource);
