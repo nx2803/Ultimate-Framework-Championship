@@ -19,14 +19,12 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.core.task.VirtualThreadTaskExecutor;
+import org.springframework.context.annotation.Bean;
 
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.data.RepositoryItemReader;
 import org.springframework.batch.infrastructure.item.data.builder.RepositoryItemReaderBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Sort;
@@ -97,18 +95,13 @@ public class CollectStatsBatchConfig {
     @Bean
     public Step collectStatsStep(ItemWriter<TechStats> techStatsWriter) {
         return new StepBuilder("collectStatsStep", jobRepository)
-                .<TechList, TechStats>chunk(10, transactionManager)
+                .<TechList, TechStats>chunk(20, transactionManager) // 청크 사이즈를 20으로 상향하여 메타데이터 업데이트 빈도 감소
                 .reader(techListReader())
                 .processor(techStatsProcessor())
                 .writer(techStatsWriter)
-                .taskExecutor(batchTaskExecutor())
                 .build();
     }
 
-    @Bean
-    public TaskExecutor batchTaskExecutor() {
-        return new VirtualThreadTaskExecutor("batch-thread-");
-    }
 
     @Bean
     public RepositoryItemReader<TechList> techListReader() {

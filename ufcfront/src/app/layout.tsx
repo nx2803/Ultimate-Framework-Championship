@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Geologica } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '../components/ThemeProvider';
 import QueryClientProvider from '../components/providers/QueryClientProvider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const geologica = Geologica({ subsets: ['latin'], variable: '--font-geologica' });
 
 export const metadata: Metadata = {
   title: 'UFC - Ultimate Framework Championship',
@@ -18,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} antialiased selection:bg-foreground selection:text-background`}>
+      <body className={`${inter.variable} ${geologica.variable} font-sans antialiased selection:bg-foreground selection:text-background`}>
         <ThemeProvider
           attribute="data-theme"
           defaultTheme="light"

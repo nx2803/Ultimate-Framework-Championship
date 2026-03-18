@@ -41,6 +41,15 @@ ChartJS.register(
 
 import { Line, Doughnut } from 'react-chartjs-2';
 
+const CornerMarkers = () => (
+  <>
+    <div className="corner-top-left" />
+    <div className="corner-top-right" />
+    <div className="corner-bottom-left" />
+    <div className="corner-bottom-right" />
+  </>
+);
+
 export default function DashboardContainer() {
   const [selectedCategory, setSelectedCategory] = useState<string>('LANGUAGE');
   const [period, setPeriod] = useState<Period>(30);
@@ -130,7 +139,7 @@ export default function DashboardContainer() {
           boxWidth: 8,
           boxHeight: 8,
           usePointStyle: true,
-          font: { family: "'Outfit', sans-serif", size: 10, weight: 600 },
+          font: { family: "var(--font-geologica)", size: 10, weight: 600 },
           padding: 20
         }
       },
@@ -138,8 +147,8 @@ export default function DashboardContainer() {
         backgroundColor: '#1a1a1a',
         titleColor: '#ffffff',
         bodyColor: '#ffffff',
-        titleFont: { family: "'Outfit', sans-serif", size: 12, weight: 600 },
-        bodyFont: { family: "'Outfit', sans-serif", size: 11, weight: 400 },
+        titleFont: { family: "var(--font-geologica)", size: 12, weight: 600 },
+        bodyFont: { family: "var(--font-geologica)", size: 11, weight: 400 },
         padding: 16,
         cornerRadius: 0,
         displayColors: true,
@@ -153,7 +162,7 @@ export default function DashboardContainer() {
         grid: { display: false },
         ticks: {
           color: 'rgba(128, 128, 128, 0.5)',
-          font: { family: "'Outfit', sans-serif", size: 9, weight: 400 },
+          font: { family: "var(--font-geologica)", size: 9, weight: 400 },
           maxRotation: 0,
           autoSkip: true,
           maxTicksLimit: 7,
@@ -281,7 +290,7 @@ export default function DashboardContainer() {
                   <TypewriterText
                     key={selectedCategory}
                     text={selectedCategory}
-                    className="text-5xl md:text-8xl font-black tracking-tighter text-foreground uppercase"
+                    className="text-5xl md:text-8xl font-light tracking-tighter text-foreground uppercase"
                     speed={80}
                   />
                 </div>
@@ -336,8 +345,9 @@ export default function DashboardContainer() {
 
           {/* Highlight Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border/40 shrink-0 overflow-hidden border border-border/50 rounded-sm">
-            <div className="bg-background p-6 flex flex-col justify-between group transition-all duration-300">
-              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground mb-4 opacity-50 group-hover:opacity-100 transition-opacity">Dominant Tech</span>
+            <div className="bg-background p-6 flex flex-col justify-between group transition-all duration-300 relative corner-frame">
+              <CornerMarkers />
+              <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground mb-4 opacity-50 group-hover:opacity-100 transition-opacity">Dominant Tech</span>
               <div className="flex items-end justify-between">
                 <div className="flex items-center gap-4 group-hover:translate-x-1 transition-transform duration-500">
                   {isStatsLoading ? (
@@ -365,13 +375,16 @@ export default function DashboardContainer() {
                   })()}
                 </div>
                 <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-3 mb-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" /> LEADER
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" /> <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1 opacity-20">
+                    CHAMPION
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-background p-6 flex flex-col justify-between group transition-all duration-300">
-              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground mb-4 opacity-50 group-hover:opacity-100 transition-opacity">Total Sector Scale</span>
+            <div className="bg-background p-6 flex flex-col justify-between group transition-all duration-300 relative corner-frame">
+              <CornerMarkers />
+              <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground mb-4 opacity-50 group-hover:opacity-100 transition-opacity">Total Sector Scale</span>
               <div className="flex items-end justify-between">
                 {isStatsLoading ? (
                   <Skeleton className="h-10 w-40" />
@@ -392,20 +405,12 @@ export default function DashboardContainer() {
           </div>
 
           {/* Chart Section */}
-          <div className="bg-background border border-border p-6 flex-1 min-h-100 flex flex-col gap-6 relative overflow-hidden group/chart rounded-sm">
-            {/* Chart Area Technical Metadata */}
-            <div className="absolute top-2 right-4 flex gap-4 text-[7px] font-mono opacity-20 pointer-events-none uppercase">
-              <span>REF_UUID: {Math.random().toString(16).substring(2, 10)}</span>
-              <span>COORDS: [40.7128, -74.0060] / LVL_SCALE: 1.0</span>
-            </div>
-
-            <div className="absolute -top-12 -right-12 p-12 pointer-events-none opacity-[0.06] group-hover/chart:opacity-[0.15] transition-opacity duration-1000">
-              <div className="text-[12rem] font-black tracking-tighter uppercase leading-none select-none">{selectedCategory}</div>
-            </div>
+          <div className="bg-background border border-border p-6 flex-1 min-h-100 flex flex-col gap-6 relative overflow-hidden group/chart rounded-sm corner-frame">
+            <CornerMarkers />
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10 shrink-0">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-foreground flex items-center gap-3">
+                <h3 className="text-[10px] font-medium uppercase tracking-[0.4em] text-foreground flex items-center gap-3">
                   <span className="w-8 h-px bg-green-400" />
                   Dynamic Analysis
                 </h3>
@@ -416,11 +421,20 @@ export default function DashboardContainer() {
                       key={m}
                       onClick={() => setMetric(m)}
                       className={cn(
-                        "px-3 md:px-4 py-1 text-[8px] font-bold uppercase tracking-widest transition-all duration-300 rounded-xs",
-                        metric === m ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted/50"
+                        "relative px-3 md:px-4 py-1 text-[8px] font-medium uppercase tracking-widest transition-all duration-300 rounded-xs",
+                        metric === m ? "text-background" : "text-muted-foreground hover:bg-muted/50"
                       )}
                     >
-                      {m === 'marketShare' ? 'Market' : m === 'starCount' ? 'Stars' : 'Forks'}
+                      {metric === m && (
+                        <motion.div
+                          layoutId="metric-bg"
+                          className="absolute inset-0 bg-foreground rounded-xs"
+                          transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
+                        />
+                      )}
+                      <span className="relative z-10">
+                        {m === 'marketShare' ? 'Market' : m === 'starCount' ? 'Stars' : 'Forks'}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -433,33 +447,56 @@ export default function DashboardContainer() {
                         key={p}
                         onClick={() => setPeriod(p as Period)}
                         className={cn(
-                          "px-4 md:px-8 py-1.5 md:py-2 text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 rounded-sm",
-                          period === p ? "bg-foreground text-background shadow-lg" : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                          "relative px-4 md:px-8 py-1.5 md:py-2 text-[9px] font-medium uppercase tracking-[0.2em] transition-all duration-300 rounded-sm",
+                          period === p ? "text-background" : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
                         )}
                       >
-                        {p}D
+                        {period === p && (
+                          <motion.div
+                            layoutId="period-bg"
+                            className="absolute inset-0 bg-foreground rounded-sm shadow-lg"
+                            transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
+                          />
+                        )}
+                        <span className="relative z-10">{p}D</span>
                       </button>
                     ))}
                   </div>
                 )}
                 <div className="flex border border-border p-0.5 bg-muted/20 rounded-sm shrink-0">
                   <button
-                    onClick={() => setChartType('line')}
-                    className={cn(
-                      "p-1.5 transition-all duration-300 rounded-sm",
-                      chartType === 'line' ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted/30"
-                    )}
-                  >
-                    <BarChart3 className={cn("w-4 h-4", chartType === 'line' ? "opacity-100" : "opacity-40")} />
-                  </button>
-                  <button
                     onClick={() => setChartType('pie')}
                     className={cn(
-                      "p-1.5 transition-all duration-300 rounded-sm",
-                      chartType === 'pie' ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted/30"
+                      "relative p-1.5 transition-all duration-300 rounded-sm",
+                      chartType === 'pie' ? "text-background" : "text-muted-foreground hover:bg-muted/30"
                     )}
+                    title="Pie Chart"
                   >
-                    <PieIcon className={cn("w-4 h-4", chartType === 'pie' ? "opacity-100" : "opacity-40")} />
+                    {chartType === 'pie' && (
+                      <motion.div
+                        layoutId="chart-type-bg"
+                        className="absolute inset-0 bg-foreground rounded-sm"
+                        transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
+                      />
+                    )}
+                    <PieIcon className={cn("relative z-10 w-4 h-4", chartType === 'pie' ? "opacity-100" : "opacity-40")} />
+                  </button>
+                  <button
+                    onClick={() => setChartType('line')}
+                    className={cn(
+                      "relative p-1.5 transition-all duration-300 rounded-sm",
+                      chartType === 'line' ? "text-background" : "text-muted-foreground hover:bg-muted/30"
+                    )}
+                    title="Line Chart"
+                  >
+                    {chartType === 'line' && (
+                      <motion.div
+                        layoutId="chart-type-bg"
+                        className="absolute inset-0 bg-foreground rounded-sm"
+                        transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
+                      />
+                    )}
+                    <Activity className={cn("relative z-10 w-4 h-4", chartType === 'line' ? "opacity-100" : "opacity-40")} />
                   </button>
                 </div>
               </div>
@@ -616,10 +653,10 @@ function StatCard({ title, value, icon, growth }: { title: string; value: number
     <div className="border border-border p-8 transition-all hover:bg-secondary/50 group">
       <div className="flex items-start justify-between mb-8 opacity-40 group-hover:opacity-100 transition-opacity">
         <div className="p-1 border border-foreground/20">{icon}</div>
-        {growth && <div className="text-[9px] font-black tracking-widest text-foreground uppercase">{growth}</div>}
+        {growth && <div className="text-[9px] font-medium tracking-widest text-foreground uppercase">{growth}</div>}
       </div>
-      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] leading-none mb-3">{title}</p>
-      <div className="text-4xl font-black text-foreground tabular-nums tracking-tighter">
+      <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em] leading-none mb-3">{title}</p>
+      <div className="text-4xl font-light text-foreground tabular-nums tracking-tighter">
         {typeof value === 'number' ? value.toLocaleString() : value}
       </div>
     </div>

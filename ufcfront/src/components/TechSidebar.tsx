@@ -71,12 +71,12 @@ export default function TechSidebar({
         <div className="flex flex-col">
           <TypewriterText
             text="UFC."
-            className="text-3xl font-black tracking-tighter uppercase leading-none text-foreground"
+            className="text-3xl font-medium tracking-tighter uppercase leading-none text-foreground"
             speed={150}
           />
           <TypewriterText
             text="Ultimate Framework Championship"
-            className="text-[9px] font-black text-muted-foreground mt-3 uppercase tracking-[0.3em] leading-tight"
+            className="text-[9px] font-medium text-muted-foreground mt-3 uppercase tracking-[0.3em] leading-tight"
             speed={30}
             delay={0.5}
           />
@@ -95,7 +95,7 @@ export default function TechSidebar({
           <input
             type="text"
             placeholder="Search Index..."
-            className="w-full h-10 bg-transparent border-b border-border rounded-none pl-7 pr-4 text-xs focus:outline-none focus:border-green-400/50 transition-all placeholder:text-muted-foreground/30 font-bold uppercase tracking-wider"
+            className="w-full h-10 bg-transparent border-b border-border rounded-none pl-7 pr-4 text-xs focus:outline-none focus:border-green-400/50 transition-all placeholder:text-muted-foreground/30 font-medium uppercase tracking-wider"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -108,7 +108,7 @@ export default function TechSidebar({
               key={cat}
               onClick={() => onSelectCategory(cat)}
               className={cn(
-                "px-2 py-2 text-[8px] font-black tracking-widest transition-all border uppercase",
+                "px-2 py-2 text-[8px] font-medium tracking-widest transition-all border uppercase",
                 selectedCategory === cat
                   ? "bg-foreground text-background border-green-400 shadow-[0_0_20px_rgba(74,222,128,0.1)]"
                   : "bg-transparent text-muted-foreground border-border hover:border-muted-foreground"
@@ -158,7 +158,7 @@ export default function TechSidebar({
                           <div className="flex items-center gap-2">
                             {ranking && (
                               <span className={cn(
-                                "text-lg font-black tracking-tighter w-6 text-left leading-none transition-colors",
+                                "text-lg font-medium tracking-tighter w-6 text-left leading-none transition-colors",
                                 isHovered || isSelected ? "text-foreground" : "text-muted-foreground/20"
                               )}>
                                 {ranking.rank}
@@ -179,7 +179,7 @@ export default function TechSidebar({
 
                           {/* Center: Name & Stats */}
                           <div className="flex flex-col">
-                            <span className={cn("text-sm transition-all", isHovered || isSelected ? "font-bold tracking-tight" : "font-medium tracking-tight")}>
+                            <span className={cn("text-sm transition-all", isHovered || isSelected ? "font-medium tracking-tight" : "font-normal tracking-tight")}>
                               <TypewriterText 
                                 key={`${tech.name}-${selectedCategory}`} 
                                 text={tech.name} 
@@ -191,7 +191,7 @@ export default function TechSidebar({
                               <div className="flex items-center gap-2 text-[9px] font-mono text-muted-foreground">
                                 {ranking.rankDiff !== 0 && (
                                   <span className={cn(
-                                    "flex items-center gap-0.5 font-black",
+                                    "flex items-center gap-0.5 font-medium",
                                     ranking.rankDiff > 0 ? "text-green-500" : "text-red-500"
                                   )}>
                                     {ranking.rankDiff > 0 ? '▲' : '▼'}{Math.abs(ranking.rankDiff)}
