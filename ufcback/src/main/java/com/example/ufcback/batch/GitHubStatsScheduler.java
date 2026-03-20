@@ -21,6 +21,7 @@ public class GitHubStatsScheduler {
     private final JobLauncher jobLauncher;
     private final Job collectStatsJob;
     private final Job trendingScanJob;
+    private final com.example.ufcback.service.LLMService llmService;
 
     /**
      * TrendingScan: 매 정각 실행 (0분)
@@ -41,10 +42,9 @@ public class GitHubStatsScheduler {
     }
 
     /**
-     * CollectStats: 매 30분에 실행 (Search API ~75회 사용)
-     * TrendingScan과 30분 간격으로 엇갈려 실행해 Search API rate limit 충돌 방지
+     * CollectStats: 매일 새벽 4시 30분에 실행 (데이터 수집 후 AI 분석 트리거)
      */
-    @Scheduled(cron = "0 30 * * * *")
+    @Scheduled(cron = "0 30 4 * * *")
     public void runCollectStats() {
         try {
             log.info("Starting CollectStats at {}", LocalDateTime.now());
@@ -52,7 +52,11 @@ public class GitHubStatsScheduler {
                     .addLocalDateTime("executedAt", LocalDateTime.now())
                     .toJobParameters();
             jobLauncher.run(collectStatsJob, params);
-            log.info("CollectStats finished");
+            log.info("CollectStats finished. Triggering LLM analysis...");
+            
+            // 데이터 수집 후 AI 분석 트리거
+            llmService.analyzeAllCategories();
+            
         } catch (Exception e) {
             log.error("Failed to run CollectStats: {}", e.getMessage());
         }

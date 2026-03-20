@@ -11,6 +11,7 @@ import { useTheme } from 'next-themes';
 import { getLogoUrl, getThemeColor } from '../lib/logoUtils';
 import { TypewriterText } from './TypewriterText';
 import { Skeleton, DashboardSkeleton } from './Skeleton';
+import { AICommentary } from './AICommentary';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -301,71 +302,15 @@ export default function DashboardContainer() {
                     speed={80}
                   />
                 </div>
+                
                 <p className="text-muted-foreground text-xs md:text-sm tracking-wide max-w-xl font-light leading-relaxed">
                   Comparative analysis of technological dominance within the {selectedCategory} ecosystem. Real-time market share mapping and relative adoption trajectories.
                 </p>
               </div>
 
-              {/* Rising Stars Widget — Always occupies space to prevent layout shift */}
-              <div className="min-w-64 md:min-w-72 min-h-55 md:min-h-70 relative shrink-0">
-                {risingStars && risingStars.length > 0 ? (
-                  <div className="bg-background p-6 rounded-sm h-full group/star-box transition-all duration-300 relative corner-frame">
-                    <CornerMarkers />
-                    <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3 flex items-center gap-2 relative z-10">
-                      <TrendingUp className="w-3 h-3 text-green-500" /> Rising Stars (7D)
-                    </h4>
-                    <div className="space-y-3">
-                      {risingStars.map((star, i) => {
-                        const starTech = techs.find(t => t.name === star.name);
-                        return (
-                          <div key={star.name} className="flex items-center justify-between gap-4 group/star">
-                            <div className="flex items-center gap-2.5">
-                              <span className="text-[9px] font-bold text-muted-foreground w-3">{i + 1}</span>
-                              <div className="w-6 h-6 flex items-center justify-center overflow-hidden shrink-0">
-                                {starTech?.logoUrl ? (
-                                  <img
-                                    src={getLogoUrl(starTech.logoUrl, star.name, theme)}
-                                    alt={star.name}
-                                    className="w-full h-full object-contain transition-all duration-300"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full bg-foreground/5 rounded-full" />
-                                )}
-                              </div>
-                              <TypewriterText
-                                key={`star-${star.name}`}
-                                text={star.name}
-                                className="text-[11px] font-bold text-foreground tracking-tight"
-                                speed={30}
-                                delay={1.5 + (i * 0.1)}
-                              />
-                            </div>
-                            <span className="text-green-500 font-mono font-bold text-[10px]">
-                              +{star.growth.toFixed(1)}%
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-background/20 p-6 rounded-sm h-full flex flex-col gap-4 relative corner-frame overflow-hidden">
-                    <CornerMarkers />
-                    <div className="h-4 w-32 bg-foreground/5 animate-pulse rounded" />
-                    <div className="flex-1 flex flex-col gap-3">
-                      {[1, 2, 3, 4, 5].map(i => (
-                        <div key={i} className="flex items-center justify-between opacity-20">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 bg-foreground/10 rounded" />
-                            <div className="w-6 h-6 bg-foreground/10 rounded-full" />
-                            <div className="w-20 h-3 bg-foreground/10 rounded" />
-                          </div>
-                          <div className="w-8 h-3 bg-foreground/10 rounded" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+              {/* AI Analyst Commentary Widget — Expanded to utilize left space */}
+              <div className="flex-1 max-w-2xl min-h-55 md:min-h-70 relative shrink-0">
+                <AICommentary category={selectedCategory} />
               </div>
             </div>
           </header>

@@ -16,7 +16,7 @@ export const techApi = {
     const { data } = await api.get<TechList[]>('/techs');
     return data;
   },
-  
+
   // 차트 데이터 조회 (단일)
   getTechStats: async (techId: number, days: Period = 30): Promise<TechStats[]> => {
     const { data } = await api.get<TechStats[]>(`/charts/${techId}`, {
@@ -30,6 +30,13 @@ export const techApi = {
     const { data } = await api.get<TechStats[]>(`/charts/category/${category}`, {
       params: { days },
     });
+    return data;
+  },
+
+  // 최신 AI 분석 조회
+  getLatestAnalysis: async (category: string): Promise<{ insight: string; createdAt: string } | null> => {
+    const { data, status } = await api.get(`/analysis/latest/${category}`);
+    if (status === 204) return null;
     return data;
   },
 };

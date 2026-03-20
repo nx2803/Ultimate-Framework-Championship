@@ -1,0 +1,52 @@
+services:
+  api: &main_app
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: ufcllm:${UFCLLM_VERSION:-latest}
+    restart: always
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      db:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
+    environment:
+      UFCLLM_HOST: 0.0.0.0
+      UFCLLM_DB_HOST: ufcllm-db
+      UFCLLM_DB_PORT: 5432
+      UFCLLM_DB_USER: ufcllm
+      UFCLLM_DB_PASS: ufcllm
+      UFCLLM_DB_BASE: ufcllm
+
+  db:
+    image: postgres:18.1-bookworm
+    hostname: ufcllm-db
+    environment:
+      POSTGRES_PASSWORD: "ufcllm"
+      POSTGRES_USER: "ufcllm"
+      POSTGRES_DB: "ufcllm"
+    volumes:
+      - ufcllm-db-data:/var/lib/postgresql
+    restart: always
+    healthcheck:
+      test: pg_isready -U ufcllm
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  migrator:
+    <<: *main_app
+    restart: "no"
+    command: alembic upgrade head
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+
+volumes:
+  ufcllm-db-data:
+    name: ufcllm-db-data

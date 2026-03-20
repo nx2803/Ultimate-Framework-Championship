@@ -91,3 +91,7 @@ info:
     name: ufc-backend
     version: 0.0.1
     java-version: 21
+# AI LLM Service Configuration
+ufc:
+  llm:
+    base-url: ${LLM_BASE_URL:http://localhost:8000/api}
