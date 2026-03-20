@@ -13,29 +13,39 @@ UFC는 전 세계 다양한 프로그래밍 프레임워크와 기술 트렌드�
 ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=for-the-badge&logo=Gradle&logoColor=white)
+![Lombok](https://img.shields.io/badge/Lombok-gray?style=for-the-badge&logo=lombok&logoColor=bc0303)
+![QueryDSL](https://img.shields.io/badge/QueryDSL-black?style=for-the-badge&logo=hibernate&logoColor=white)
 - **Framework**: Java 21, Spring Boot 4.x
 - **Data Pipeline**: Spring Batch 6.x
-- **Database**: PostgreSQL (Supabase)
+- **Database**: PostgreSQL (Supabase), QueryDSL 5.1
 - **Cache**: Redis (Upstash)
 
 ### Frontend
 ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![TanStack Query](https://img.shields.io/badge/-TanStack%20Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Framer](https://img.shields.io/badge/Framer-black?style=for-the-badge&logo=framer&logoColor=blue)
 ![Chart.js](https://img.shields.io/badge/chart.js-F5788D.svg?style=for-the-badge&logo=chart.js&logoColor=white)
-- **Framework**: Next.js (App Router), React 18
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Visualization**: Chart.js, Framer Motion
+![Lucide](https://img.shields.io/badge/Lucide-black?style=for-the-badge&logo=lucide&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)
+- **Framework**: Next.js (App Router), React 19
+- **Data Fetching**: TanStack Query v5, Axios
+- **Styling**: Tailwind CSS v4, Lucide Icons, Framer Motion
+- **Visualization**: Chart.js, React-Chartjs-2
 
 ### Analysis (AI)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white)
 ![Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)
+![Pydantic](https://img.shields.io/badge/Pydantic-e92063?style=for-the-badge&logo=pydantic&logoColor=white)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-D71F00?style=for-the-badge&logo=sqlalchemy&logoColor=white)
+![Asyncpg](https://img.shields.io/badge/Asyncpg-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![Loguru](https://img.shields.io/badge/Loguru-00ADBB?style=for-the-badge&logo=fluentd&logoColor=white)
 - **Framework**: FastAPI (Python 3.12+)
-- **LLM Engine**: Google Gemini 3 Flash / 2.0 Flash
+- **LLM Engine**: Google Gemini 3 Flash
+- **Core Libs**: Pydantic v2, SQLAlchemy 2.0 (Async), Asyncpg, Loguru
 - **Database**: PostgreSQL (Shared with Backend)
 
 ### DevOps
