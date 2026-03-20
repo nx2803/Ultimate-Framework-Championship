@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { techApi } from "@/lib/api";
 import { Sparkles } from "lucide-react";
 
@@ -23,6 +23,7 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
   const [isTyping, setIsTyping] = useState(false);
   const [timestamp, setTimestamp] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const prevInsightRef = useRef<string | null>(null);
 
   useEffect(() => {
     const fetchAnalysis = async () => {
@@ -50,8 +51,13 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
     if (!insight) {
       setDisplayedText("");
       setIsTyping(false);
+      prevInsightRef.current = null;
       return;
     }
+
+    // 이미 같은 내용이 출력 중이거나 완료되었다면 재시작하지 않음 (깜빡임 방지)
+    if (insight === prevInsightRef.current) return;
+    prevInsightRef.current = insight;
 
     let currentIndex = 0;
     setDisplayedText("");
@@ -65,7 +71,7 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
         clearInterval(typingInterval);
         setIsTyping(false);
       }
-    }, 20); // 20ms 간격으로 더 빠르게 타이핑
+    }, 20);
 
     return () => clearInterval(typingInterval);
   }, [insight]);
@@ -109,12 +115,24 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
       <div className="flex-1 flex gap-3 relative z-10">
 
         {insight ? (
-          <p className="text-[12px] md:text-[13px] font-medium text-foreground/80 leading-relaxed italic min-h-12 relative">
-            {displayedText}
+          <div className="relative min-h-12 w-full">
+            <p className="text-[12px] md:text-[13px] font-medium text-foreground/80 leading-relaxed whitespace-pre-wrap">
+              {displayedText}
+              <span className="inline-block w-2" /> {/* 커서 공간 미리 확보 */}
+            </p>
             {isTyping && (
-              <span className="inline-block w-0.5 h-[0.9em] ml-1 bg-green-500 animate-pulse align-middle" />
+              <span
+                className="absolute bg-green-500 animate-pulse"
+                style={{
+                  width: '2px',
+                  height: '1.1em',
+                  bottom: '0.2em',
+                  marginLeft: '2px',
+                  display: 'inline-block',
+                }}
+              />
             )}
-          </p>
+          </div>
         ) : (
           <p className="text-[11px] text-muted-foreground/50 italic flex items-center h-full">
             분석 데이터를 기다리는 중입니다...

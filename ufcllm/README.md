@@ -2,10 +2,11 @@
 title: UFC LLM Analysis
 emoji: 🥊
 colorFrom: green
-colorTo: white
+colorTo: gray
 sdk: docker
 pinned: false
 app_port: 7860
+short_description: Codig technology trend analysis using Gemini 3 & FastAPI
 ---
 
 # 🥊 UFC LLM (Ultimate Framework Championship - Analysis Module)
