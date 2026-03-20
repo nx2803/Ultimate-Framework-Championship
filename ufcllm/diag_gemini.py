@@ -1,4 +1,4 @@
-import google.generativeai as genai
+from google import genai
 import os
 from dotenv import load_dotenv
 
@@ -7,22 +7,21 @@ load_dotenv()
 
 api_key = os.getenv("UFCLLM_GEMINI_API_KEY")
 
-print(f"--- Gemini Diagnostics ---")
-print(f"SDK Version: {genai.__version__}")
+print(f"--- Gemini Diagnostics (New SDK) ---")
 print(f"API Key (masked): {api_key[:8]}...{api_key[-4:] if api_key else 'None'}")
 
 if not api_key:
     print("Error: API Key not found in .env")
     exit(1)
 
-genai.configure(api_key=api_key)
+client = genai.Client(api_key=api_key)
 
 print("\nListing available models for this API Key:")
 try:
-    for m in genai.list_models():
-        if 'generateContent' in m.supported_generation_methods:
-            print(f"- {m.name} (Supports: {m.supported_generation_methods})")
+    for m in client.models.list():
+        print(f"- {m.name}")
 except Exception as e:
     print(f"Failed to list models: {str(e)}")
+
 
 print("\n--- End of Diagnostics ---")

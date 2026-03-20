@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.responses import UJSONResponse
+from fastapi.responses import UJSONResponse, RedirectResponse
 
 from ufcllm.log import configure_logging
 from ufcllm.web.api.router import api_router
@@ -27,4 +27,13 @@ def get_app() -> FastAPI:
     # Main router for the API.
     app.include_router(router=api_router, prefix="/api")
 
+    @app.get("/", include_in_schema=False)
+    def root_redirect() -> RedirectResponse:
+        """
+        Redirect to API documentation.
+        """
+        return RedirectResponse(url="/api/docs")
+
     return app
+
+

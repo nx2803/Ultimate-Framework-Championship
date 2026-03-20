@@ -1,12 +1,12 @@
 # ufcllm/ufcllm/services/gemini.py
-import google.generativeai as genai
+from google import genai
 from ufcllm.settings import settings
 
 class GeminiEngine:
     def __init__(self):
         # 2026년 기준 가장 효율적인 Flash 모델
-        genai.configure(api_key=settings.gemini_api_key)
-        self.model = genai.GenerativeModel('models/gemini-3-flash-preview')
+        self.client = genai.Client(api_key=settings.gemini_api_key)
+        self.model_id = 'gemini-3-flash-preview'
 
     async def generate_tech_insight(self, category: str, stats_summary: str):
         prompt = f"""
@@ -32,5 +32,8 @@ class GeminiEngine:
         3. 분량: 임팩트 있는 2~3줄 이내의 간결한 문장.
         4. 핵심: 이번 시즌 가장 높은 에너지를 보여준 'MVP(Rising Star)' 기술 1개를 반드시 선정하고 그 이유를 설명할 것.
         """
-        response = await self.model.generate_content_async(prompt)
+        response = self.client.models.generate_content(
+            model=self.model_id,
+            contents=prompt,
+        )
         return response.text.strip()
