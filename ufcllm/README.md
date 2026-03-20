@@ -13,7 +13,7 @@ To run the project use this set of commands:
 uv sync --locked
 uv run -m ufcllm
 ```
-
+ 
 This will start the server on the configured host.
 
 You can find swagger documentation at `/api/docs`.
@@ -65,7 +65,7 @@ ufcllm
 ```
 
 ## Configuration
-
+ 
 This application can be configured with environment variables.
 
 You can create `.env` file in the root directory and place all
