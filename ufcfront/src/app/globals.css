@@ -65,7 +65,7 @@
   --radius-md: var(--radius);
   --radius-sm: var(--radius);
 
-  --font-sans: var(--font-geologica), 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-geologica), var(--font-noto-sans-kr), 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 * {

@@ -3,26 +3,23 @@ on:
   push:
     branches: [main]
     paths:
-      - 'ufcllm/**' # ufcllm 폴더 내 파일이 변경될 때만 실행
+      - 'ufcllm/**'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Install subtree tool
-        run: |
-          # ufcllm 폴더만 분리해서 푸시하기 위해 git subtree 사용
-          git config --global user.email "git@github.com"
-          git config --global user.name "GitHub Actions"
 
       - name: Push ufcllm folder to HF
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # 1. ufcllm 폴더의 내용만 가지는 임시 브랜치 생성
-          # 2. 허깅페이스 원격 저장소에 강제 푸시
-          git subtree push --prefix ufcllm https://nx2803:$HF_TOKEN@huggingface.co/spaces/nx2803/UFC_LLM main
+          git config --global user.email "git@github.com"
+          git config --global user.name "GitHub Actions"
+          git subtree split --prefix ufcllm -b hf-deploy
+          git push https://nx2803:$HF_TOKEN@huggingface.co/spaces/nx2803/UFC_LLM hf-deploy:main --force

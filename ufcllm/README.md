@@ -65,7 +65,7 @@ ufcllm
 ```
 
 ## Configuration
- 
+
 This application can be configured with environment variables.
 
 You can create `.env` file in the root directory and place all
