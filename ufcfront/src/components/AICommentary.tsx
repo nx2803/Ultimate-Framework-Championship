@@ -118,20 +118,10 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
           <div className="relative min-h-12 w-full">
             <p className="text-[12px] md:text-[13px] font-medium text-foreground/80 leading-relaxed whitespace-pre-wrap">
               {displayedText}
-              <span className="inline-block w-2" /> {/* 커서 공간 미리 확보 */}
+              {isTyping && (
+                <span className="inline-block w-0.5 h-[1.1em] ml-1 bg-green-500 animate-pulse align-middle" />
+              )}
             </p>
-            {isTyping && (
-              <span
-                className="absolute bg-green-500 animate-pulse"
-                style={{
-                  width: '2px',
-                  height: '1.1em',
-                  bottom: '0.2em',
-                  marginLeft: '2px',
-                  display: 'inline-block',
-                }}
-              />
-            )}
           </div>
         ) : (
           <p className="text-[11px] text-muted-foreground/50 italic flex items-center h-full">
