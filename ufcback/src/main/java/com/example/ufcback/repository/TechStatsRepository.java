@@ -3,6 +3,9 @@ package com.example.ufcback.repository;
 import com.example.ufcback.domain.TechStats;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,4 +25,8 @@ public interface TechStatsRepository extends JpaRepository<TechStats, Long> {
     
     // 수집 실패 시 이전(가장 최근) 데이터를 가져오기 위한 메서드
     Optional<TechStats> findFirstByTechIdOrderByCollectedAtDesc(Long techId);
+
+    @Modifying
+    @Query("DELETE FROM TechStats t WHERE t.collectedAt < :date")
+    int deleteByCollectedAtBefore(@Param("date") LocalDateTime date);
 }

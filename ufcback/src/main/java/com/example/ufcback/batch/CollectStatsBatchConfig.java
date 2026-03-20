@@ -131,44 +131,60 @@ public class CollectStatsBatchConfig {
                     Integer stars = 0;
                     Integer forks = 0;
                     if (tech.getPrimaryRepo() != null && !tech.getPrimaryRepo().isEmpty()) {
-                        try {
-                            String repoJson = gitHubClient.getRepositoryDetails(tech.getPrimaryRepo());
-                            GitHubRepoItem repoItem = objectMapper.readValue(repoJson, GitHubRepoItem.class);
+                        for (int attempt = 1; attempt <= 3; attempt++) {
+                            try {
+                                String repoJson = gitHubClient.getRepositoryDetails(tech.getPrimaryRepo());
+                                GitHubRepoItem repoItem = objectMapper.readValue(repoJson, GitHubRepoItem.class);
 
-                            if (repoItem != null) {
-                                Integer s = repoItem.stargazersCount();
-                                Integer f = repoItem.forksCount();
-                                stars = (s != null) ? s : 0;
-                                forks = (f != null) ? f : 0;
+                                if (repoItem != null) {
+                                    Integer s = repoItem.stargazersCount();
+                                    Integer f = repoItem.forksCount();
+                                    stars = (s != null) ? s : 0;
+                                    forks = (f != null) ? f : 0;
+                                }
+                                break; // 성공 시 재시도 루프 종료
+                            } catch (java.io.IOException | RuntimeException e) {
+                                log.warn("Attempt {}/3 failed to get repo details for {}: {}. Error: {}", attempt, tech.getPrimaryRepo(), e.getMessage(), e.getClass().getSimpleName());
+                                if (attempt == 3) {
+                                    log.error("All 3 attempts failed for repo {}", tech.getPrimaryRepo());
+                                } else {
+                                    try { Thread.sleep(2000 * attempt); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+                                }
                             }
-                        } catch (java.io.IOException | RuntimeException e) {
-                            log.warn("Failed to get repo details for {}: {}. Error: {}", tech.getPrimaryRepo(), e.getMessage(), e.getClass().getSimpleName());
                         }
                     }
 
                     Integer repoCount = 0;
                     if (tech.getTopicKeyword() != null && !tech.getTopicKeyword().isEmpty()) {
-                        try {
-                            // LANGUAGE 카테고리는 language: 쿼리 사용 (topic: 쿼리보다 정확하고 안정적)
-                            // 기타 카테고리는 topic: 쿼리 사용
-                            boolean isLanguage = "LANGUAGE".equals(tech.getCategory());
-                            String searchJson = isLanguage
-                                    ? gitHubClient.getLanguageStats(tech.getTopicKeyword())
-                                    : gitHubClient.getTopicStats(tech.getTopicKeyword());
+                        for (int attempt = 1; attempt <= 3; attempt++) {
+                            try {
+                                // LANGUAGE 카테고리는 language: 쿼리 사용 (topic: 쿼리보다 정확하고 안정적)
+                                // 기타 카테고리는 topic: 쿼리 사용
+                                boolean isLanguage = "LANGUAGE".equals(tech.getCategory());
+                                String searchJson = isLanguage
+                                        ? gitHubClient.getLanguageStats(tech.getTopicKeyword())
+                                        : gitHubClient.getTopicStats(tech.getTopicKeyword());
 
-                            GitHubSearchResponse searchResponse = objectMapper.readValue(searchJson,
-                                    GitHubSearchResponse.class);
+                                GitHubSearchResponse searchResponse = objectMapper.readValue(searchJson,
+                                        GitHubSearchResponse.class);
 
-                            if (searchResponse != null && searchResponse.totalCount() != null) {
-                                repoCount = searchResponse.totalCount();
-                                log.info("[{}] {} query='{}{}': {} repos",
-                                        tech.getCategory(), tech.getName(),
-                                        isLanguage ? "language:" : "topic:",
-                                        tech.getTopicKeyword(), repoCount);
+                                if (searchResponse != null && searchResponse.totalCount() != null) {
+                                    repoCount = searchResponse.totalCount();
+                                    log.info("[{}] {} query='{}{}': {} repos",
+                                            tech.getCategory(), tech.getName(),
+                                            isLanguage ? "language:" : "topic:",
+                                            tech.getTopicKeyword(), repoCount);
+                                }
+                                break; // 성공 시 재시도 루프 종료
+                            } catch (java.io.IOException | RuntimeException e) {
+                                log.warn("Attempt {}/3 failed to get repo count for {} ({}): {}. Error: {}", 
+                                        attempt, tech.getName(), tech.getCategory(), e.getMessage(), e.getClass().getSimpleName());
+                                if (attempt == 3) {
+                                    log.error("All 3 attempts failed for repo count {}", tech.getName());
+                                } else {
+                                    try { Thread.sleep(2000 * attempt); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+                                }
                             }
-                        } catch (java.io.IOException | RuntimeException e) {
-                            log.error("Failed to get repo count for {} ({}): {}. Error: {}",
-                                    tech.getName(), tech.getCategory(), e.getMessage(), e.getClass().getSimpleName());
                         }
                     }
 
