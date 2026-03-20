@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { techApi } from "@/lib/api";
-import { Sparkles, Quote } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 interface AICommentaryProps {
   category: string;
@@ -19,6 +19,8 @@ const CornerMarkers = () => (
 
 export const AICommentary = ({ category }: AICommentaryProps) => {
   const [insight, setInsight] = useState<string | null>(null);
+  const [displayedText, setDisplayedText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const [timestamp, setTimestamp] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -42,6 +44,31 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
 
     fetchAnalysis();
   }, [category]);
+
+  // 타이핑 애니메이션 효과
+  useEffect(() => {
+    if (!insight) {
+      setDisplayedText("");
+      setIsTyping(false);
+      return;
+    }
+
+    let currentIndex = 0;
+    setDisplayedText("");
+    setIsTyping(true);
+
+    const typingInterval = setInterval(() => {
+      setDisplayedText(insight.substring(0, currentIndex + 1));
+      currentIndex++;
+
+      if (currentIndex >= insight.length) {
+        clearInterval(typingInterval);
+        setIsTyping(false);
+      }
+    }, 20); // 20ms 간격으로 더 빠르게 타이핑
+
+    return () => clearInterval(typingInterval);
+  }, [insight]);
 
   const formatRelativeTime = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -72,23 +99,21 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
   return (
     <div className="bg-background p-6 rounded-sm h-full group/commentbox transition-all duration-300 relative corner-frame flex flex-col min-h-45">
       <CornerMarkers />
-      
+
       <div className="flex justify-between items-center mb-4 relative z-10">
         <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
           <Sparkles className="w-3 h-3 text-[#22c55e] animate-pulse" /> Analyzed Insight
         </h4>
-        {timestamp && (
-          <span className="text-[9px] text-muted-foreground/60 font-mono font-medium">
-            LIVE • {timestamp}
-          </span>
-        )}
       </div>
-      
+
       <div className="flex-1 flex gap-3 relative z-10">
-        <Quote className="w-5 h-5 text-foreground/10 shrink-0 transform -rotate-12 mt-1" />
+
         {insight ? (
-          <p className="text-[12px] md:text-[13px] font-medium text-foreground/80 leading-relaxed italic">
-            "{insight}"
+          <p className="text-[12px] md:text-[13px] font-medium text-foreground/80 leading-relaxed italic min-h-12 relative">
+            {displayedText}
+            {isTyping && (
+              <span className="inline-block w-0.5 h-[0.9em] ml-1 bg-green-500 animate-pulse align-middle" />
+            )}
           </p>
         ) : (
           <p className="text-[11px] text-muted-foreground/50 italic flex items-center h-full">
