@@ -21,7 +21,7 @@ jobs:
 
       - name: Push ufcllm folder to HF
         env:
-          HF_TOKEN: ${{ HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           # 1. ufcllm 폴더의 내용만 가지는 임시 브랜치 생성
           # 2. 허깅페이스 원격 저장소에 강제 푸시
