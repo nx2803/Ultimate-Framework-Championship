@@ -107,7 +107,7 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
       <CornerMarkers />
 
       <div className="flex justify-between items-center mb-4 relative z-10">
-        <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+        <h4 className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-2">
           <Sparkles className="w-3 h-3 text-[#22c55e] animate-pulse" /> Analyzed Insight
         </h4>
       </div>
