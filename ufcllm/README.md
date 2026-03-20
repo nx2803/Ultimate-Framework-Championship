@@ -1,162 +1,53 @@
-# ufcllm
+---
+title: UFC LLM Analysis
+emoji: 🥊
+colorFrom: green
+colorTo: white
+sdk: docker
+pinned: false
+app_port: 7860
+---
 
-This project was generated using fastapi_template.
+# 🥊 UFC LLM (Ultimate Framework Championship - Analysis Module)
 
-## UV
+이 프로젝트는 UFC(Ultimate Framework Championship) 플랫폼의 핵심 AI 분석 엔진입니다. 
+GitHub의 기술트렌드 데이터를 바탕으로 **Google Gemini 3 Flash** 모델을 사용하여 스포츠 중계 스타일의 인사이트를 생성합니다.
 
-This project uses uv. It's a modern dependency management
-tool.
+## 🚀 주요 기능
+- **AI 분석**: 전 세계 프레임워크/언어의 별점, 포크, 리포지토리 점유율 변화 분석.
+- **스포츠 중계 컨셉**: 딱딱한 통계가 아닌 생동감 넘치는 '코딩 리그' 중계 해설 생성.
+- **FastAPI 기반**: 고성능 비동기 API 서버로 신속한 인사이트 제공.
 
-To run the project use this set of commands:
+## 🛠️ 기술 스택
+- **Language**: Python 3.12+
+- **Framework**: FastAPI
+- **LLM**: Google Gemini 3 Flash / 2.0 Flash
+- **Dependency Management**: UV / Poetry
+- **Infrastructure**: Docker (Hugging Face Spaces)
+
+## ⚙️ 환경 변수 (Secrets)
+Hugging Face Spaces의 **Settings > Variables and secrets**에서 다음 항목을 설정해야 합니다:
+
+| Key | Description |
+|-----|-------------|
+| `UFCLLM_GEMINI_API_KEY` | Google AI Studio에서 발급받은 Gemini API 키 |
+| `UFC_DB_URL` | 수집된 통계 및 분석 결과를 저장할 PostgreSQL DB URL (asyncpg용) |
+
+## 📦 로컬 실행 가이드
+로컬 환경에서 테스트하려면 `uv`를 사용하는 것이 가장 빠릅니다.
 
 ```bash
 uv sync --locked
 uv run -m ufcllm
 ```
- 
-This will start the server on the configured host.
 
-You can find swagger documentation at `/api/docs`.
+Swagger 배포 문서는 `/api/docs`에서 확인할 수 있습니다.
 
-You can read more about uv here: https://docs.astral.sh/ruff/
-
-## Docker
-
-You can start the project with docker using this command:
-
+## 🐳 Docker 개발
 ```bash
-docker-compose up --build
+docker build -t ufc-llm .
+docker run -p 7860:7860 --env-file .env ufc-llm
 ```
 
-If you want to develop in docker with autoreload and exposed ports add `-f deploy/docker-compose.dev.yml` to your docker command.
-Like this:
-
-```bash
-docker-compose -f docker-compose.yml -f deploy/docker-compose.dev.yml --project-directory . up --build
-```
-
-This command exposes the web application on port 8000, mounts current directory and enables autoreload.
-
-But you have to rebuild image every time you modify `uv.lock` or `pyproject.toml` with this command:
-
-```bash
-docker-compose build
-```
-
-## Project structure
-
-```bash
-$ tree "ufcllm"
-ufcllm
-├── conftest.py  # Fixtures for all tests.
-├── db  # module contains db configurations
-│   ├── dao  # Data Access Objects. Contains different classes to interact with database.
-│   └── models  # Package contains different models for ORMs.
-├── __main__.py  # Startup script. Starts uvicorn.
-├── services  # Package for different external services such as rabbit or redis etc.
-├── settings.py  # Main configuration settings for project.
-├── static  # Static content.
-├── tests  # Tests for project.
-└── web  # Package contains web server. Handlers, startup config.
-    ├── api  # Package with all handlers.
-    │   └── router.py  # Main router.
-    ├── application.py  # FastAPI application configuration.
-    └── lifespan.py  # Contains actions to perform on startup and shutdown.
-```
-
-## Configuration
-
-This application can be configured with environment variables.
-
-You can create `.env` file in the root directory and place all
-environment variables here. 
-
-All environment variables should start with "UFCLLM_" prefix.
-
-For example if you see in your "ufcllm/settings.py" a variable named like
-`random_parameter`, you should provide the "UFCLLM_RANDOM_PARAMETER" 
-variable to configure the value. This behaviour can be changed by overriding `env_prefix` property
-in `ufcllm.settings.Settings.Config`.
-
-An example of .env file:
-```bash
-UFCLLM_RELOAD="True"
-UFCLLM_PORT="8000"
-UFCLLM_ENVIRONMENT="dev"
-```
-
-You can read more about BaseSettings class here: https://pydantic-docs.helpmanual.io/usage/settings/
-
-## Pre-commit
-
-To install pre-commit simply run inside the shell:
-```bash
-pre-commit install
-```
-
-pre-commit is very useful to check your code before publishing it.
-It's configured using .pre-commit-config.yaml file.
-
-By default it runs:
-* mypy (validates types);
-* ruff (spots possible bugs);
-
-
-You can read more about pre-commit here: https://pre-commit.com/
-
-## Migrations
-
-If you want to migrate your database, you should run following commands:
-```bash
-# To run all migrations until the migration with revision_id.
-alembic upgrade "<revision_id>"
-
-# To perform all pending migrations.
-alembic upgrade "head"
-```
-
-### Reverting migrations
-
-If you want to revert migrations, you should run:
-```bash
-# revert all migrations up to: revision_id.
-alembic downgrade <revision_id>
-
-# Revert everything.
- alembic downgrade base
-```
-
-### Migration generation
-
-To generate migrations you should run:
-```bash
-# For automatic change detection.
-alembic revision --autogenerate
-
-# For empty file generation.
-alembic revision
-```
-
-
-## Running tests
-
-If you want to run it in docker, simply run:
-
-```bash
-docker-compose run --build --rm api pytest -vv .
-docker-compose down
-```
-
-For running tests on your local machine.
-1. you need to start a database.
-
-I prefer doing it with docker:
-```
-docker run -p "5432:5432" -e "POSTGRES_PASSWORD=ufcllm" -e "POSTGRES_USER=ufcllm" -e "POSTGRES_DB=ufcllm" postgres:18.1-bookworm
-```
-
-
-2. Run the pytest.
-```bash
-pytest -vv .
-```
+---
+*본 모듈은 UFC 메인 백엔드(Spring Boot)의 스케줄러에 의해 매일 자동으로 호출되어 새로운 해설을 생성합니다.*
