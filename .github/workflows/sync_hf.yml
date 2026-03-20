@@ -19,7 +19,20 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git config --global user.email "git@github.com"
-          git config --global user.name "GitHub Actions"
-          git subtree split --prefix ufcllm -b hf-deploy
-          git push https://nx2803:$HF_TOKEN@huggingface.co/spaces/nx2803/UFC_LLM hf-deploy:main --force
+          # 1. 임시 작업 디렉토리 생성 및 ufcllm 복사
+          mkdir -p /tmp/hf_deploy
+          cp -r ufcllm/* /tmp/hf_deploy/
+          cp ufcllm/README.md /tmp/hf_deploy/ 2>/dev/null || true
+          
+          # 2. 임시 디렉토리에서 새 Git 저장소 초기화
+          cd /tmp/hf_deploy
+          git init
+          git config user.email "git@github.com"
+          git config user.name "GitHub Actions"
+          
+          # 3. 허깅페이스 전용 브랜치 구성
+          git add .
+          git commit -m "UFC. SYSTEM | ANALYSIS. MODULE Update"
+          
+          # 4. 강제 푸시 (기존 히스토리 무시하고 덮어쓰기)
+          git push https://nx2803:$HF_TOKEN@huggingface.co/spaces/nx2803/UFC_LLM main --force
