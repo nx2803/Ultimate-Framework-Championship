@@ -18,10 +18,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Hugging Face Spaces 사용자 설정 (UID 1000)
 # Spaces는 보안상의 이유로 루트 권한이 아닌 특정 사용자로 실행되어야 합니다.
-RUN useradd -m -u 1000 user
+RUN useradd -m -u 1000 user && chown -R user:user /app
 USER user
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH
+
 
 # 프로젝트 파일 복사 (소유권 설정 포함)
 COPY --chown=user:user . .
