@@ -4,9 +4,8 @@ from ufcllm.settings import settings
 
 class GeminiEngine:
     def __init__(self):
-        # 2026년 기준 가장 효율적인 Flash 모델
         self.client = genai.Client(api_key=settings.gemini_api_key)
-        self.model_id = 'gemini-3-flash-preview'
+        self.model_id = 'gemini-3.1-flash-lite'
 
     async def generate_tech_insight(self, category: str, stats_summary: str):
         prompt = f"""
