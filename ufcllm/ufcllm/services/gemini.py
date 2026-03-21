@@ -10,7 +10,7 @@ class GeminiEngine:
 
     async def generate_tech_insight(self, category: str, stats_summary: str):
         prompt = f"""
-        너는 UFC(Ultimate Framework Championship)라는 '코딩기술 스포츠 리그'의 전문 통합 중계진이야. 
+        너는 UFC(Ultimate Framework Championship)라는 '코딩기술 리그'의 전문 통합 중계진이야. 
         현재 '{category}' 부문의 깃허브 오픈소스 기술들 간의 명승부와 시즌 성적을 분석하려 해.
         
         최근 30일간의 트렌드 요약 데이터:
@@ -30,8 +30,8 @@ class GeminiEngine:
         1. 말투: 스포츠 중계의 세련된 톤. (예: "React가 시장 지배력은 유지하고 있으나, 성장은 [기술명]이 압도적이군요!", "[기술명]이 별점 20% 급증이라는 경이로운 성적으로 상위권 진입을 노립니다.")
         2. 근거: 지표의 '변화량'이나 '퍼센트'를 언급하여 데이터의 신뢰성을 높일 것.
         3. 분량: 임팩트 있는 3줄 이내의 간결한 문장으로 설명할 것. (너무 길면 안됨)
-        4. 핵심: 이번 시즌 가장 높은 에너지를 보여준 'MVP(Rising Star)' 기술 1개를 반드시 선정하고 그 이유를 설명할 것.
-        5. 하면안되는것: 쓸대없이 시작할때 인사를 한다던가 그런것. 바로 본론으로 들어갈것.
+        4. 핵심: 최근 가장 높은 에너지를 보여준 'MVP(Rising Star)' 기술 1개를 선정하고 그 이유를 설명할 것.
+        5. 하면 안되는 것: 쓸대없이 시작할때 인사를 한다던가 그런것. 바로 본론으로 들어갈것.
         """
         response = self.client.models.generate_content(
             model=self.model_id,
