@@ -5,7 +5,7 @@ from ufcllm.settings import settings
 class GeminiEngine:
     def __init__(self):
         self.client = genai.Client(api_key=settings.gemini_api_key)
-        self.model_id = 'gemini-3.1-flash-lite'
+        self.model_id = 'gemini-3.1-flash-lite-preview'
 
     async def generate_tech_insight(self, category: str, stats_summary: str):
         prompt = f"""
