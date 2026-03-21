@@ -531,7 +531,7 @@ export default function DashboardContainer() {
                           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-1">
                             {/* 기술 이름 — 항상 같은 높이 차지 */}
                             <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-muted-foreground select-none h-4 flex items-center">
-                              {hoveredTech && techRankings[hoveredTech] ? hoveredTech : ''}
+                              {hoveredTech && techRankings[hoveredTech] ? hoveredTech : 'TOTAL'}
                             </span>
                             {/* 숫자 — 항상 고정 */}
                             <div className="flex items-baseline gap-1">
@@ -540,7 +540,9 @@ export default function DashboardContainer() {
                                   ? (metric === 'marketShare'
                                     ? techRankings[hoveredTech].share.toFixed(1)
                                     : techRankings[hoveredTech].share.toLocaleString())
-                                  : '100'}
+                                  : (metric === 'marketShare' 
+                                      ? '100' 
+                                      : currentTechs.reduce((sum, name) => sum + techRankings[name].share, 0).toLocaleString())}
                               </span>
                               <span className="text-[10px] font-bold mt-auto select-none">
                                 {metric === 'marketShare' ? '%' : ''}
@@ -550,7 +552,7 @@ export default function DashboardContainer() {
                             <span className="text-[5px] font-mono uppercase tracking-[0.8em] leading-none select-none text-muted-foreground h-3 flex items-center">
                               {hoveredTech && techRankings[hoveredTech]
                                 ? (metric === 'marketShare' ? 'Market_Share' : metric === 'starCount' ? 'Star_Count' : 'Fork_Count')
-                                : 'Sector_Core'}
+                                : (metric === 'marketShare' ? 'Total_Share' : metric === 'starCount' ? 'Total_Stars' : 'Total_Forks')}
                             </span>
                           </div>
                         </div>

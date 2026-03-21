@@ -48,7 +48,8 @@ async def analyze_category(
                 "tech": r[0],
                 "date": str(r[1]),
                 "stars": r[2],
-                "forks": r[3]
+                "forks": r[3],
+                "repos": r[4]
             })
         
         stats_summary = json.dumps(summary_data, ensure_ascii=False)

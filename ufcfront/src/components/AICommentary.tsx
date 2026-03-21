@@ -92,7 +92,11 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
     return (
       <div className="bg-background/20 p-6 rounded-sm h-full flex flex-col gap-4 relative corner-frame overflow-hidden min-h-[240px]">
         <CornerMarkers />
-        <div className="h-4 w-32 bg-foreground/5 animate-pulse rounded" />
+        <div className="flex justify-between items-center mb-4 relative z-10">
+          <h4 className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-2">
+            <Sparkles className="w-3 h-3 text-[#22c55e] animate-pulse" /> Analyzed Insight
+          </h4>
+        </div>
         <div className="flex-1 space-y-2">
           <div className="h-3 w-full bg-foreground/5 animate-pulse rounded" />
           <div className="h-3 w-full bg-foreground/5 animate-pulse rounded" />
