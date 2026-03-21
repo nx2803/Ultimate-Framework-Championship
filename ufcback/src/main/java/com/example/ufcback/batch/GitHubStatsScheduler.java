@@ -42,9 +42,9 @@ public class GitHubStatsScheduler {
     }
 
     /**
-     * CollectStats: 매일 새벽 4시 30분에 실행 (데이터 수집 후 AI 분석 트리거)
+     * CollectStats: 매 시간 :30분에 실행 (GitHub star/fork/repo 수집)
      */
-    @Scheduled(cron = "0 30 4 * * *")
+    @Scheduled(cron = "0 30 * * * *")
     public void runCollectStats() {
         try {
             log.info("Starting CollectStats at {}", LocalDateTime.now());
@@ -52,13 +52,18 @@ public class GitHubStatsScheduler {
                     .addLocalDateTime("executedAt", LocalDateTime.now())
                     .toJobParameters();
             jobLauncher.run(collectStatsJob, params);
-            log.info("CollectStats finished. Triggering LLM analysis...");
-            
-            // 데이터 수집 후 AI 분석 트리거
-            llmService.analyzeAllCategories();
-            
+            log.info("CollectStats finished.");
         } catch (Exception e) {
             log.error("Failed to run CollectStats: {}", e.getMessage());
         }
+    }
+
+    /**
+     * LLM Analysis: 매일 새벽 4시 30분에 실행 (AI 인사이트 분석, 하루 1회)
+     */
+    @Scheduled(cron = "0 30 4 * * *")
+    public void runLLMAnalysis() {
+        log.info("Starting daily LLM analysis at {}", LocalDateTime.now());
+        llmService.analyzeAllCategories();
     }
 }

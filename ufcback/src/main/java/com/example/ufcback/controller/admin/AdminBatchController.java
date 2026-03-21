@@ -1,5 +1,6 @@
 package com.example.ufcback.controller.admin;
 
+import com.example.ufcback.service.LLMService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class AdminBatchController {
     private final JobLauncher jobLauncher;
     private final Job collectStatsJob;
     private final Job trendingScanJob;
+    private final LLMService llmService;
 
     @PostMapping("/collect-stats")
     @Operation(summary = "기술 점유율 수집 배치 즉시 실행", description = "Github 정보를 조회하여 기술별 점유율 통계를 즉시 계산하고 DB에 저장합니다.")
@@ -58,5 +60,13 @@ public class AdminBatchController {
             log.error("Failed to run manual TrendingScanJob", e);
             return ResponseEntity.internalServerError().body("배치 실행 실패: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/llm-analysis")
+    @Operation(summary = "LLM AI 분석 즉시 실행", description = "모든 카테고리에 대해 FastAPI LLM 분석을 즉시 요청합니다. (카테고리당 20초 소요, 약 2분 이상 걸림)")
+    public ResponseEntity<String> runLLMAnalysis() {
+        log.info("Manual LLM analysis triggered at {}", LocalDateTime.now());
+        llmService.analyzeAllCategories();
+        return ResponseEntity.ok("LLM 분석이 백그라운드에서 시작되었습니다. 완료까지 약 2-3분 소요됩니다.");
     }
 }
