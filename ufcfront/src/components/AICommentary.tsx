@@ -90,7 +90,7 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
 
   if (loading) {
     return (
-      <div className="bg-background/20 p-6 rounded-sm h-full flex flex-col gap-4 relative corner-frame overflow-hidden min-h-45">
+      <div className="bg-background/20 p-6 rounded-sm h-full flex flex-col gap-4 relative corner-frame overflow-hidden min-h-[240px]">
         <CornerMarkers />
         <div className="h-4 w-32 bg-foreground/5 animate-pulse rounded" />
         <div className="flex-1 space-y-2">
@@ -103,7 +103,7 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
   }
 
   return (
-    <div className="bg-background p-6 rounded-sm h-full group/commentbox transition-all duration-300 relative corner-frame flex flex-col min-h-45">
+    <div className="bg-background p-6 rounded-sm h-full group/commentbox transition-all duration-300 relative corner-frame flex flex-col min-h-[240px]">
       <CornerMarkers />
 
       <div className="flex justify-between items-center mb-4 relative z-10">
@@ -115,7 +115,7 @@ export const AICommentary = ({ category }: AICommentaryProps) => {
       <div className="flex-1 flex gap-3 relative z-10">
 
         {insight ? (
-          <div className="relative min-h-12 w-full">
+          <div className="relative min-h-[120px] w-full">
             <p className="text-[12px] md:text-[13px] font-medium text-foreground/80 leading-relaxed whitespace-pre-wrap">
               {displayedText}
               {isTyping && (
