@@ -574,7 +574,10 @@ export default function DashboardContainer() {
                                     <span className="text-[11px] font-bold tracking-tight text-foreground transition-all group-hover/item:translate-x-1">{name}</span>
                                   </div>
                                   <div className="flex items-center gap-4">
-                                    <span className="text-[10px] font-mono font-black" style={{ color }}>{val.toFixed(2)}{metric === 'marketShare' ? '%' : ''}</span>
+                                    <span className="text-[10px] font-mono font-black" style={{ color }}>
+                                      {metric === 'marketShare' ? val.toFixed(2) : Math.round(val).toLocaleString()}
+                                      {metric === 'marketShare' ? '%' : ''}
+                                    </span>
                                     <div className="w-1 h-1 rounded-full bg-foreground/10 group-hover/item:bg-white animate-pulse" />
                                   </div>
                                 </div>
