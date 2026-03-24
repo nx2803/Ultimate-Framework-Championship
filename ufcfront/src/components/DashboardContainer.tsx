@@ -177,7 +177,7 @@ export default function DashboardContainer() {
           color: 'rgba(128, 128, 128, 0.5)',
           font: { family: "'Outfit', sans-serif", size: 9, weight: 400 },
           padding: 10,
-          callback: (val: any) => `${val}%`
+          callback: (val: any) => metric === 'marketShare' ? `${val}%` : val.toLocaleString()
         }
       }
     }
