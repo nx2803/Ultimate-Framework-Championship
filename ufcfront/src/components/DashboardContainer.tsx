@@ -272,7 +272,7 @@ export default function DashboardContainer() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25, ease: "easeInOut" }}
-          className="flex-1 p-4 md:p-8 flex flex-col gap-6 max-w-7xl mx-auto w-full overflow-y-auto lg:h-full lg:overflow-hidden"
+          className="flex-1 p-3 md:p-8 flex flex-col gap-4 md:gap-6 max-w-7xl mx-auto w-full overflow-y-auto lg:h-full lg:overflow-hidden"
         >
           {/* Mobile Header Toggle */}
           <div className="lg:hidden flex items-center justify-between mb-2">
@@ -282,19 +282,21 @@ export default function DashboardContainer() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="text-[10px] font-black tracking-widest uppercase">UFC Census</div>
+            <div className="text-[10px] font-black tracking-widest uppercase">UFC.</div>
           </div>
           {/* Main Header / Title Section */}
           <header className="flex flex-col space-y-2 shrink-0">
-            <div className="flex items-center gap-4 text-muted-foreground mb-4">
-              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-foreground shrink-0">C:\UFC\SYSTEM\ANALYSIS_MODULE</span>
-              <div className="h-px flex-1 bg-border" />
-              <span className="text-[10px] font-mono shrink-0">{format(new Date(), 'yyyy-MM-dd HH:mm:ss')}</span>
+            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 text-muted-foreground mb-4">
+              <div className="flex items-center gap-4 flex-1">
+                <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-foreground shrink-0">C:\UFC\SYSTEM\ANALYSIS_MODULE</span>
+                <div className="hidden md:block h-px flex-1 bg-border" />
+              </div>
+              <span className="text-[10px] font-mono shrink-0 md:opacity-100 opacity-60">{format(new Date(), 'yyyy-MM-dd HH:mm:ss')}</span>
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-              <div className="flex-1 min-h-45 md:min-h-60 flex flex-col justify-start">
-                <div className="mb-4 md:mb-6 flex items-baseline gap-2 md:gap-4">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-6">
+              <div className="flex-1 md:min-h-60 flex flex-col justify-start">
+                <div className="mb-2 md:mb-6 flex items-baseline gap-2 md:gap-4">
                   <TypewriterText
                     key={selectedCategory}
                     text={selectedCategory}
@@ -302,26 +304,26 @@ export default function DashboardContainer() {
                     speed={80}
                   />
                 </div>
-                
-                <p className="text-muted-foreground text-xs md:text-sm tracking-wide max-w-xl font-light leading-relaxed">
+
+                <p className="hidden md:block text-muted-foreground text-xs md:text-sm tracking-wide max-w-xl font-light leading-relaxed">
                   Comparative analysis of technological dominance within the {selectedCategory} ecosystem. Real-time market share mapping and relative adoption trajectories.
                 </p>
               </div>
 
               {/* AI Analyst Commentary Widget — Expanded to utilize left space */}
-              <div className="flex-1 max-w-2xl min-h-55 md:min-h-70 relative shrink-0">
+              <div className="flex-1 max-w-2xl md:min-h-70 relative shrink-0">
                 <AICommentary category={selectedCategory} />
               </div>
             </div>
           </header>
 
           {/* Highlight Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 shrink-0 overflow-visible">
-            <div className="bg-background p-6 flex flex-col justify-between group transition-all duration-300 relative corner-frame">
+          <div className="grid grid-cols-2 lg:grid-cols-2 gap-2 md:gap-6 shrink-0 overflow-visible">
+            <div className="bg-background p-4 md:p-6 flex flex-col justify-between group transition-all duration-300 relative corner-frame min-h-32 md:min-h-0">
               <CornerMarkers />
-              <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground mb-4">Dominant Tech</span>
-              <div className="flex items-end justify-between">
-                <div className="flex items-center gap-4 group-hover:translate-x-1 transition-transform duration-500">
+              <span className="text-[8px] md:text-[10px] font-medium uppercase tracking-[0.2em] md:tracking-[0.3em] text-muted-foreground mb-3 md:mb-4">Dominant Tech</span>
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-1">
+                <div className="flex items-center gap-2 md:gap-4 group-hover:translate-x-1 transition-transform duration-500">
                   {isStatsLoading ? (
                     <Skeleton className="h-10 w-32" />
                   ) : (() => {
@@ -331,14 +333,14 @@ export default function DashboardContainer() {
                     return (
                       <>
                         {topTech?.logoUrl && (
-                          <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center overflow-hidden shrink-0">
+                          <div className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center overflow-hidden shrink-0">
                             <img src={getLogoUrl(topTech.logoUrl, topTechName, theme)} alt={topTechName} className="w-full h-full object-contain transition-all duration-500" />
                           </div>
                         )}
                         <TypewriterText
                           key={`dominant-${topTechName}`}
                           text={topTechName || '---'}
-                          className="text-5xl font-medium tracking-tighter"
+                          className="text-2xl md:text-5xl font-medium tracking-tighter"
                           speed={100}
                           delay={1.2}
                         />
@@ -346,38 +348,38 @@ export default function DashboardContainer() {
                     );
                   })()}
                 </div>
-                <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1">
-                  <Trophy className="w-3 h-3 text-foreground" /> <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1">
-                    CHAMPION
+                <div className="text-[8px] md:text-[10px] font-mono text-muted-foreground flex items-center gap-1 md:gap-2 mb-0.5 md:mb-1">
+                  <Trophy className="w-2 md:w-3 h-2 md:h-3 text-foreground" /> <div className="text-[8px] md:text-[10px] font-mono text-muted-foreground flex items-center gap-1 md:gap-2 mb-0.5 md:mb-1">
+                    CHAMP
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-background p-6 flex flex-col justify-between group transition-all duration-300 relative corner-frame">
+            <div className="bg-background p-4 md:p-6 flex flex-col justify-between group transition-all duration-300 relative corner-frame min-h-32 md:min-h-0">
               <CornerMarkers />
-              <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground mb-4">Total Sector Scale</span>
-              <div className="flex items-end justify-between">
+              <span className="text-[8px] md:text-[10px] font-medium uppercase tracking-[0.2em] md:tracking-[0.3em] text-muted-foreground mb-3 md:mb-4">Total Sector Scale</span>
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-1">
                 {isStatsLoading ? (
-                  <Skeleton className="h-10 w-40" />
+                  <Skeleton className="h-6 md:h-10 w-24 md:w-40" />
                 ) : (
                   <TypewriterText
                     key={`scale-${selectedCategory}`}
                     text={Array.from(new Set(stats.map(s => s.repoCount))).reduce((a, b) => a + b, 0).toLocaleString()}
-                    className="text-5xl font-medium tracking-tighter group-hover:translate-x-1 transition-transform duration-500"
+                    className="text-2xl md:text-5xl font-medium tracking-tighter group-hover:translate-x-1 transition-transform duration-500"
                     speed={50}
                     delay={1.5}
                   />
                 )}
-                <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 mb-1">
-                  ACTIVE REPOS
+                <div className="text-[8px] md:text-[10px] font-mono text-muted-foreground flex items-center gap-1 md:gap-2 mb-0.5 md:mb-1">
+                  ACTIVE
                 </div>
               </div>
             </div>
           </div>
 
           {/* Chart Section */}
-          <div className="bg-background p-6 flex-1 min-h-[400px] flex flex-col gap-6 relative group/chart rounded-sm corner-frame">
+          <div className="bg-background p-4 md:p-6 flex-none lg:flex-1 min-h-95 md:min-h-100 flex flex-col gap-4 md:gap-6 relative group/chart rounded-sm corner-frame w-full">
             <CornerMarkers />
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10 shrink-0">
@@ -474,7 +476,7 @@ export default function DashboardContainer() {
               </div>
             </div>
 
-            <div className="flex-1 min-h-0 relative z-10 py-4">
+            <div className={cn("relative z-10 py-4 w-full", chartType === 'line' ? "flex-1 min-h-0" : "flex-none")}>
               {isStatsLoading ? (
                 <div className="w-full h-full flex items-center justify-center">
                   <Skeleton className="w-full h-full" />
@@ -487,12 +489,12 @@ export default function DashboardContainer() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 1.02 }}
                     transition={{ duration: 0.4 }}
-                    className="w-full h-full"
+                    className={cn("w-full", chartType === 'line' ? "h-full" : "h-auto md:h-full")}
                   >
                     {chartType === 'line' ? (
                       <Line data={chartData} options={chartOptions} />
                     ) : (
-                      <div className="w-full h-full flex flex-col md:flex-row items-center justify-between gap-10 py-4 px-6 relative overflow-hidden">
+                      <div className="w-full h-auto md:h-full flex flex-col md:flex-row items-center justify-between gap-8 md:gap-10 py-4 px-2 md:px-6 relative">
                         {/* Far Left Detail Panel */}
                         <div className="hidden lg:flex flex-col gap-4 self-stretch justify-center transition-opacity duration-500 select-none pointer-events-none">
                           <div className="flex flex-col gap-1">
@@ -509,7 +511,7 @@ export default function DashboardContainer() {
                           </div>
                         </div>
                         {/* Thin Doughnut Container (Pushed Left) */}
-                        <div className="relative w-full max-w-104 aspect-square flex items-center justify-center p-14 group/core">
+                        <div className="relative w-full max-w-65 md:max-w-104 aspect-square flex items-center justify-center p-2 md:p-14 group/core mx-auto">
                           {/* Corner Metadata (Technical Polish) */}
                           <div className="absolute top-0 left-0 text-[6px] font-mono flex flex-col gap-1 uppercase select-none">
                             <span>System_ID: 0x88AF</span>
@@ -519,9 +521,6 @@ export default function DashboardContainer() {
                             <span>Sync_Active: 100%</span>
                             <span>Frame_Rate: 60Hz</span>
                           </div>
-
-
-
 
                           <div className="w-full h-full relative z-10 drop-shadow-[0_0_40px_rgba(255,255,255,0.06)] group-hover/core:scale-[1.02] transition-transform duration-700">
                             <Doughnut data={pieData} options={pieOptions} />
@@ -540,9 +539,9 @@ export default function DashboardContainer() {
                                   ? (metric === 'marketShare'
                                     ? techRankings[hoveredTech].share.toFixed(1)
                                     : techRankings[hoveredTech].share.toLocaleString())
-                                  : (metric === 'marketShare' 
-                                      ? '100' 
-                                      : currentTechs.reduce((sum, name) => sum + techRankings[name].share, 0).toLocaleString())}
+                                  : (metric === 'marketShare'
+                                    ? '100'
+                                    : currentTechs.reduce((sum, name) => sum + techRankings[name].share, 0).toLocaleString())}
                               </span>
                               <span className="text-[10px] font-bold mt-auto select-none">
                                 {metric === 'marketShare' ? '%' : ''}
@@ -558,7 +557,7 @@ export default function DashboardContainer() {
                         </div>
 
                         {/* Custom Technical Legend (Vertical Stream - Pushed Right) */}
-                        <div className="flex-1 w-full max-w-md flex flex-col gap-4 border-l border-border/20 pl-12 overflow-y-auto max-h-80 pr-2 custom-scrollbar">
+                        <div className="flex-1 w-full max-w-md flex flex-col gap-4 border-t md:border-t-0 md:border-l border-border/20 pt-6 md:pt-0 pl-0 md:pl-12 overflow-y-auto max-h-80 pr-2 custom-scrollbar">
                           <div className="flex items-center gap-3 mb-2">
                             <div className="w-1 h-3 bg-green-500" />
                             <span className="text-[8px] font-mono font-bold tracking-[0.4em] uppercase">Sector_Analysis_Stream</span>
