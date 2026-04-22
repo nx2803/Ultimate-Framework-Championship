@@ -75,7 +75,7 @@ graph TD
     FE <-->|"REST API 통신"| BE["Backend<br/>Spring Boot / Render"]
     
     subgraph Data Pipeline
-        BE -->|"Schedule (매시간)"| Batch["Spring Batch 6.x"]
+        BE -->|"Schedule (매일 00:30)"| Batch["Spring Batch 6.x"]
         Batch <-->|"GraphQL / REST API"| Github[("GitHub API")]
     end
     
@@ -92,7 +92,7 @@ graph TD
 
 - **Frontend (Vercel)**: Next.js 기반 반응형 인터페이스. 백엔드에서 제공하는 시계열 통계 및 AI 해설 데이터를 시각적으로 생동감 있게 표현합니다.
 - **Backend (Render)**: Spring Boot 기반 메인 서버. 프론트엔드 API 요청 처리, Redis 캐싱, 데이터 보간 및 전반적인 비즈니스 로직을 총괄조율합니다.
-- **Data Pipeline (Spring Batch)**: 매시간 수십 개의 기술 지표를 수억 건 단위의 GitHub 코퍼스 바탕으로 긁어오기 위해 백엔드 서버에서 독립적으로 도는 배치 프로세스입니다.
+- **Data Pipeline (Spring Batch)**: 매일 수십 개의 기술 지표를 수억 건 단위의 GitHub 코퍼스 바탕으로 긁어오기 위해 백엔드 서버에서 독립적으로 도는 배치 프로세스입니다.
 - **AI Module (Hugging Face)**: FastAPI 기반 독립 마이크로서비스로, 백엔드의 호출을 받아 Gemini API로 트렌드 분석을 요청하고 DB에 해설을 영구 저장합니다.
 - **Data & Cache**: 공통 PostgreSQL 데이터베이스를 사용해 상태를 공유하며, 부하 방지를 위해 Redis로 API 응답을 임시 저장(캐싱)합니다.
 
@@ -101,8 +101,8 @@ graph TD
 ## ✨ 주요 데이터 파이프라인 및 핵심 기술
 
 **1. GitHub API 자동 수집 및 Batch Processing (`Spring Batch 6.x`)**
-- **도입 배경**: 전 세계 수십 개의 프레임워크 지표를 매시간 누락 없이 안정적으로 긁어오기 위한 강력한 데이터 파이프라인이 필요했습니다.
-- **해결 및 효과**: Spring Boot 4의 최신 `Spring Batch 6.x`를 도입, 레거시 저장소를 걷어내고 `Chunk Processing`을 통해 대량의 통계 데이터를 트랜잭션 단위로 안전하게 처리합니다.
+- **도입 배경**: 전 세계 수십 개의 프레임워크 지표를 매일 누락 없이 안정적으로 긁어오기 위한 강력한 데이터 파이프라인이 필요했습니다.
+- **해결 및 효과**: Spring Boot 3의 최신 `Spring Batch 5.x`를 도입, 레거시 저장소를 걷어내고 `Chunk Processing`을 통해 대량의 통계 데이터를 트랜잭션 단위로 안전하게 처리합니다.
 
 **2. Java 21 Virtual Threads (가상 스레드) 최적화**
 - **도입 배경**: 외부 API(GitHub)를 동기식으로 반복 호출할 때 발생하는 I/O 병목 현상과 무거운 운영체제 스레드 생성 비용을 해결해야 했습니다.
@@ -152,9 +152,12 @@ graph TD
 - **도입 배경**: 만약 수집용 배치 프레임워크가 전부 실패하여 빈 데이터 상태인데도 AI가 트렌드 분석을 시작하면, 왜곡된 해설(Hallucination)이 프론트에 전시되는 치명적 사태를 초래할 수 있습니다.
 - **해결 및 효과**: AI 모듈로 분석을 트리거하기 전, 백엔드가 직접 최근 2시간 이내에 수집된 데이터의 정합성을 한 번 더 검증하고 이상 시 자동 분석을 거부합니다. API를 통한 **AI 서버 3회 재시도**를 구현하여 빈틈없는 완전 자동화 해설 체계를 마련했습니다.
 
-**14. 자동화된 데이터 유지보수 (Automated Maintenance)**
-- **도입 배경**: 1시간마다 누적되는 시계열 통계 데이터와 매일 수백 줄씩 쏟아지는 AI 분석 로그가 장기간 방치될 시 테이블이 비대해져 전체 DB 조회 쿼리 속도가 급감할 우려가 존재했습니다.
-- **해결 및 효과**: 자체적인 **DataMaintenanceService** 데몬이 매일 자정에 조용히 활동하며, 미리 설정된 보관 기한(**90일**)이 초과한 노후 데이터들을 단 1ms의 성능 저하 없이 주기적으로 분리 삭제(Clean-up)합니다.
+**15. 고성능 대시보드 최적화 (Advanced Data Sampling & Aggregation)**
+- **도입 배경**: 시계열 데이터가 누적됨에 따라 차트 조회 시 수만 건의 데이터를 처리하느라 7초 이상의 심각한 로딩 지연이 발생했습니다.
+- **해결 및 효과**: 
+    - **DB 레벨 샘플링**: 자바 메모리가 아닌 DB 엔진 레벨에서 인덱스를 타는 `IN` 절 기반 샘플링을 수행해 네트워크 전송량을 95% 절감했습니다.
+    - **Pre-computed Aggregation**: 복잡한 시장 점유율 계산을 DB의 `GROUP BY`로 최적화하여 서버 응답 속도를 **7초에서 0.5초 미만**으로 혁신적으로 단축했습니다.
+    - **Frontend Memoization**: `useMemo`와 캐싱 전략을 통해 차트 인터랙션 시의 미세한 렉(Lag)을 완전히 제거했습니다.
 
 
 ---
