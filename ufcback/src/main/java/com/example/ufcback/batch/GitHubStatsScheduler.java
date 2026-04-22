@@ -42,9 +42,9 @@ public class GitHubStatsScheduler {
     }
 
     /**
-     * CollectStats: 매 시간 :30분에 실행 (GitHub star/fork/repo 수집)
+     * CollectStats: 매일 새벽 00:30분에 실행 (GitHub star/fork/repo 수집)
      */
-    @Scheduled(cron = "0 30 * * * *")
+    @Scheduled(cron = "0 30 0 * * *")
     public void runCollectStats() {
         try {
             log.info("Starting CollectStats at {}", LocalDateTime.now());

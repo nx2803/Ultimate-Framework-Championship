@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TechList, TechStats, Period } from '../types';
 import { techApi } from '../lib/api';
@@ -90,7 +90,7 @@ export default function DashboardContainer() {
     '#333333', '#4D4D4D', '#B3B3B3', '#E6E6E6'
   ];
 
-  const chartData = {
+  const chartData = useMemo(() => ({
     labels,
     datasets: Object.keys(statsByTech).length > 0
       ? Object.keys(statsByTech)
@@ -118,7 +118,7 @@ export default function DashboardContainer() {
           };
         })
       : []
-  };
+  }), [labels, statsByTech, selectedTechNames, techs, hoveredTech, theme, metric]);
 
   const chartOptions: ChartOptions<'line'> = {
     responsive: true,
@@ -183,11 +183,13 @@ export default function DashboardContainer() {
     }
   };
 
-  const currentTechs = Object.keys(techRankings)
-    .filter(name => selectedTechNames.length === 0 || selectedTechNames.includes(name))
-    .sort((a, b) => techRankings[b].share - techRankings[a].share);
+  const currentTechs = useMemo(() => 
+    Object.keys(techRankings)
+      .filter(name => selectedTechNames.length === 0 || selectedTechNames.includes(name))
+      .sort((a, b) => techRankings[b].share - techRankings[a].share)
+  , [techRankings, selectedTechNames]);
 
-  const pieData = {
+  const pieData = useMemo(() => ({
     labels: currentTechs,
     datasets: [
       {
@@ -211,7 +213,7 @@ export default function DashboardContainer() {
         cutout: '94%'
       }
     ]
-  };
+  }), [currentTechs, techRankings, techs, hoveredTech, theme]);
 
   const pieOptions: ChartOptions<'doughnut'> = {
     responsive: true,
