@@ -30,23 +30,23 @@ public class TechChartService {
     @Cacheable(value = "techStats", key = "#techId + '-' + #days")
     public List<TechStatsResponse> getStatsByTech(Long techId, int days) {
         LocalDateTime startDate = LocalDateTime.now().minusDays(days);
+        int interval = getSamplingInterval(days);
         
         TechList targetTech = techListRepository.findById(techId)
                 .orElseThrow(() -> new IllegalArgumentException("Tech not found: " + techId));
         
-        List<TechStats> targetStats = techStatsRepository.findByTechIdAndCollectedAtAfterOrderByCollectedAtAsc(techId, startDate);
-        List<TechStats> sampledStats = filterBySampling(targetStats, days);
+        // DB 레벨에서 샘플링된 데이터만 조회
+        List<TechStats> sampledStats = techStatsRepository.findSampledStatsByTech(techId, startDate, interval);
         
-        List<TechStats> categoryStats = techStatsRepository.findByTechCategoryAndCollectedAtAfter(targetTech.getCategory(), startDate);
+        // DB에서 카테고리 합계를 직접 조회
+        List<com.example.ufcback.repository.CategoryTotalProjection> categoryTotals = 
+                techStatsRepository.findCategoryTotalByDate(targetTech.getCategory(), startDate);
         
-        Map<LocalDateTime, Integer> totalRepoCountByDate = categoryStats.stream()
-                .filter(s -> s.getCollectedAt() != null)
-                .collect(Collectors.groupingBy(
-                        s -> s.getCollectedAt().withMinute(0).withSecond(0).withNano(0),
-                        Collectors.summingInt(s -> {
-                            Integer rc = s.getRepoCount();
-                            return rc != null ? rc : 0;
-                        })
+        Map<LocalDateTime, Long> totalRepoCountByDate = categoryTotals.stream()
+                .collect(Collectors.toMap(
+                        p -> p.getCollectedAt().withMinute(0).withSecond(0).withNano(0),
+                        p -> p.getTotalRepoCount(),
+                        (existing, replacement) -> existing + replacement
                 ));
         
             try {
@@ -56,7 +56,7 @@ public class TechChartService {
                                 if (stats.getCollectedAt() == null || stats.getTech() == null) return null;
                                 
                                 LocalDateTime truncatedTime = stats.getCollectedAt().withMinute(0).withSecond(0).withNano(0);
-                                Integer totalInDate = totalRepoCountByDate.getOrDefault(truncatedTime, 0);
+                                Long totalInDate = totalRepoCountByDate.getOrDefault(truncatedTime, 0L);
                                 Integer currentRepoCount = stats.getRepoCount() != null ? stats.getRepoCount() : 0;
                                 
                                 Double share = (totalInDate > 0) 
@@ -89,18 +89,20 @@ public class TechChartService {
     @Cacheable(value = "categoryStats", key = "#category + '-' + #days")
     public List<TechStatsResponse> getStatsByCategory(String category, int days) {
         LocalDateTime startDate = LocalDateTime.now().minusDays(days);
+        int interval = getSamplingInterval(days);
         
-        List<TechStats> categoryStats = techStatsRepository.findByTechCategoryAndCollectedAtAfter(category, startDate);
-        List<TechStats> sampledStats = filterBySampling(categoryStats, days);
+        // DB 레벨에서 샘플링된 데이터만 조회
+        List<TechStats> sampledStats = techStatsRepository.findSampledStatsByCategory(category, startDate, interval);
         
-        Map<LocalDateTime, Integer> totalRepoCountByDate = categoryStats.stream()
-                .filter(s -> s.getCollectedAt() != null)
-                .collect(Collectors.groupingBy(
-                        s -> s.getCollectedAt().withMinute(0).withSecond(0).withNano(0),
-                        Collectors.summingInt(s -> {
-                            Integer rc = s.getRepoCount();
-                            return rc != null ? rc : 0;
-                        })
+        // DB에서 카테고리 합계를 직접 조회
+        List<com.example.ufcback.repository.CategoryTotalProjection> categoryTotals = 
+                techStatsRepository.findCategoryTotalByDate(category, startDate);
+        
+        Map<LocalDateTime, Long> totalRepoCountByDate = categoryTotals.stream()
+                .collect(Collectors.toMap(
+                        p -> p.getCollectedAt().withMinute(0).withSecond(0).withNano(0),
+                        p -> p.getTotalRepoCount(),
+                        (existing, replacement) -> existing + replacement
                 ));
         
             try {
@@ -110,7 +112,7 @@ public class TechChartService {
                                 if (stats.getCollectedAt() == null || stats.getTech() == null) return null;
             
                                 LocalDateTime truncatedTime = stats.getCollectedAt().withMinute(0).withSecond(0).withNano(0);
-                                Integer totalInDate = totalRepoCountByDate.getOrDefault(truncatedTime, 0);
+                                Long totalInDate = totalRepoCountByDate.getOrDefault(truncatedTime, 0L);
                                 Integer currentRepoCount = stats.getRepoCount() != null ? stats.getRepoCount() : 0;
             
                                 Double share = (totalInDate > 0) 
@@ -141,13 +143,17 @@ public class TechChartService {
             }
         }
 
+    private int getSamplingInterval(int days) {
+        if (days <= 3) return 1;
+        if (days <= 7) return 2;
+        if (days <= 30) return 4;
+        return 12;
+    }
+
     /**
-     * 조회 기간에 따라 데이터 포인트를 샘플링하여 반환합니다.
-     * 3일 이하: 모든 데이터 (1시간 간격)
-     * 7일 이하: 2시간 간격
-     * 30일 이하: 4시간 간격
-     * 그 외: 12시간 간격
+     * @deprecated DB 레벨 샘플링 쿼리(findSampledStats...) 사용을 권장합니다.
      */
+    @Deprecated
     private List<TechStats> filterBySampling(List<TechStats> stats, int days) {
         if (stats == null || stats.isEmpty()) return List.of();
         
