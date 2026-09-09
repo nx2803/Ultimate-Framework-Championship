@@ -17,6 +17,7 @@ export const parseDate = (dateVal: any) => {
 };
 
 export type MetricType = 'marketShare' | 'starCount' | 'forkCount';
+export type DisplayMode = 'absolute' | 'growth';
 
 export function useTechData(selectedCategory: string, period: Period, metric: MetricType = 'marketShare') {
   // 1. 전체 기술 목록 조회 (전역 캐싱)
@@ -105,7 +106,18 @@ export function useTechData(selectedCategory: string, period: Period, metric: Me
 
     const labels = Array.from(new Set(stats.map(s => format(parseDate(s.collectedAt), 'MM/dd HH:mm')))).sort();
 
-    return { statsByTech, techRankings, risingStars, labels };
+    // 각 타임스탬프별 기술 순위 매핑 (Rank 모드용)
+    const rankingsByTimestamp: Record<string, Record<string, number>> = {};
+    timestamps.forEach(ts => {
+      const label = format(parseDate(ts), 'MM/dd HH:mm');
+      const rAt = getRankingsAt(ts);
+      rankingsByTimestamp[label] = {};
+      Object.keys(rAt).forEach(name => {
+        rankingsByTimestamp[label][name] = rAt[name].rank;
+      });
+    });
+
+    return { statsByTech, techRankings, risingStars, labels, rankingsByTimestamp };
   }, [stats, metric]);
 
   return {

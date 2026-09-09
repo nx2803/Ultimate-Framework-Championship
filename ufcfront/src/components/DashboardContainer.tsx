@@ -6,7 +6,7 @@ import { TechList, TechStats, Period } from '../types';
 import { techApi } from '../lib/api';
 import TechSidebar from './TechSidebar';
 import { cn } from '../lib/utils';
-import { useTechData, parseDate, MetricType } from '../hooks/useTechData';
+import { useTechData, parseDate, MetricType, DisplayMode } from '../hooks/useTechData';
 import { useTheme } from 'next-themes';
 import { getLogoUrl, getThemeColor } from '../lib/logoUtils';
 import { TypewriterText } from './TypewriterText';
@@ -55,6 +55,7 @@ export default function DashboardContainer() {
   const [selectedCategory, setSelectedCategory] = useState<string>('LANGUAGE');
   const [period, setPeriod] = useState<Period>(30);
   const [metric, setMetric] = useState<MetricType>('marketShare');
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('absolute');
   const [hoveredTech, setHoveredTech] = useState<string | null>(null);
   const [selectedTechNames, setSelectedTechNames] = useState<string[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -68,6 +69,7 @@ export default function DashboardContainer() {
     techRankings,
     risingStars,
     labels,
+    rankingsByTimestamp,
     isTechsLoading,
     isStatsLoading
   } = useTechData(selectedCategory, period, metric);
@@ -90,98 +92,132 @@ export default function DashboardContainer() {
     '#333333', '#4D4D4D', '#B3B3B3', '#E6E6E6'
   ];
 
-  const chartData = useMemo(() => ({
-    labels,
-    datasets: Object.keys(statsByTech).length > 0
-      ? Object.keys(statsByTech)
-        .filter(name => selectedTechNames.length === 0 || selectedTechNames.includes(name))
-        .map((techName, index) => {
-          const techInfo = techs.find(t => t.name === techName);
-          const rawColor = techInfo?.color || colors[index % colors.length];
-          const brandColor = getThemeColor(rawColor, techName, theme);
-          const isHovered = hoveredTech === techName;
-          const hasHover = hoveredTech !== null;
+  const chartData = useMemo(() => {
+    const activeTechNames = Object.keys(statsByTech).length > 0
+      ? Object.keys(statsByTech).filter(name => selectedTechNames.length === 0 || selectedTechNames.includes(name))
+      : [];
 
-          return {
-            label: techName,
-            data: labels.map(label => {
-              const stat = statsByTech[techName].find(s => format(parseDate(s.collectedAt), 'MM/dd HH:mm') === label);
-              return stat ? (stat[metric] as number) : null;
-            }),
-            borderColor: hasHover ? (isHovered ? brandColor : `${brandColor}20`) : brandColor,
-            backgroundColor: `${brandColor}10`,
-            borderWidth: isHovered ? 4 : 2,
-            pointRadius: 0,
-            pointHoverRadius: 6,
-            tension: 0.3,
-            fill: false,
-          };
-        })
-      : []
-  }), [labels, statsByTech, selectedTechNames, techs, hoveredTech, theme, metric]);
+    return {
+      labels,
+      datasets: activeTechNames.map((techName, index) => {
+        const techInfo = techs.find(t => t.name === techName);
+        const rawColor = techInfo?.color || colors[index % colors.length];
+        const brandColor = getThemeColor(rawColor, techName, theme);
+        const isHovered = hoveredTech === techName;
+        const hasHover = hoveredTech !== null;
 
-  const chartOptions: ChartOptions<'line'> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: {
-      duration: 800,
-      easing: 'easeOutQuart'
-    },
-    interaction: {
-      mode: 'index',
-      intersect: false,
-    },
-    plugins: {
-      legend: {
-        display: true,
-        position: 'top',
-        align: 'end',
-        labels: {
-          boxWidth: 8,
-          boxHeight: 8,
-          usePointStyle: true,
-          font: { family: "var(--font-geologica)", size: 10, weight: 600 },
-          padding: 20
+        const techStatsList = statsByTech[techName] || [];
+
+        // 모드별 데이터 계산
+        let rawDataPoints: (number | null)[] = [];
+        if (displayMode === 'growth') {
+          const firstStat = techStatsList[0];
+          const baseVal = firstStat ? (firstStat[metric] as number) : 0;
+          rawDataPoints = labels.map(label => {
+            const stat = techStatsList.find(s => format(parseDate(s.collectedAt), 'MM/dd HH:mm') === label);
+            if (!stat || !baseVal) return 0;
+            const curVal = stat[metric] as number;
+            return Number((((curVal - baseVal) / baseVal) * 100).toFixed(2));
+          });
+        } else {
+          // 'absolute' (Standard / Dynamic Y-Scaling)
+          rawDataPoints = labels.map(label => {
+            const stat = techStatsList.find(s => format(parseDate(s.collectedAt), 'MM/dd HH:mm') === label);
+            return stat ? (stat[metric] as number) : null;
+          });
+        }
+
+        return {
+          label: techName,
+          data: rawDataPoints,
+          borderColor: hasHover ? (isHovered ? brandColor : `${brandColor}20`) : brandColor,
+          backgroundColor: `${brandColor}15`,
+          borderWidth: isHovered ? 4 : 2,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          tension: 0.35,
+          fill: displayMode === 'growth',
+        };
+      })
+    };
+  }, [labels, statsByTech, selectedTechNames, techs, hoveredTech, theme, metric, displayMode]);
+
+  const chartOptions: ChartOptions<'line'> = useMemo(() => {
+    const isGrowth = displayMode === 'growth';
+
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 800,
+        easing: 'easeOutQuart'
+      },
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'end',
+          labels: {
+            boxWidth: 8,
+            boxHeight: 8,
+            usePointStyle: true,
+            font: { family: "var(--font-geologica)", size: 10, weight: 600 },
+            padding: 20
+          }
+        },
+        tooltip: {
+          backgroundColor: '#1a1a1a',
+          titleColor: '#ffffff',
+          bodyColor: '#ffffff',
+          titleFont: { family: "var(--font-geologica)", size: 12, weight: 600 },
+          bodyFont: { family: "var(--font-geologica)", size: 11, weight: 400 },
+          padding: 16,
+          cornerRadius: 0,
+          displayColors: true,
+          callbacks: {
+            label: (item: any) => {
+              const val = item.raw;
+              if (val === null || val === undefined) return `${item.dataset.label}: N/A`;
+              if (isGrowth) return `${item.dataset.label}: ${val > 0 ? '+' : ''}${val}%`;
+              return `${item.dataset.label}: ${item.formattedValue}${metric === 'marketShare' ? '%' : ''}`;
+            }
+          }
         }
       },
-      tooltip: {
-        backgroundColor: '#1a1a1a',
-        titleColor: '#ffffff',
-        bodyColor: '#ffffff',
-        titleFont: { family: "var(--font-geologica)", size: 12, weight: 600 },
-        bodyFont: { family: "var(--font-geologica)", size: 11, weight: 400 },
-        padding: 16,
-        cornerRadius: 0,
-        displayColors: true,
-        callbacks: {
-          label: (item: any) => `${item.dataset.label}: ${item.formattedValue}${metric === 'marketShare' ? '%' : ''}`,
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: {
+            color: 'rgba(128, 128, 128, 0.5)',
+            font: { family: "var(--font-geologica)", size: 9, weight: 400 },
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 7,
+            padding: 10
+          }
+        },
+        y: {
+          beginAtZero: false, // Auto Dynamic Y-Axis Scaling으로 파동 폭 극대화
+          grace: isGrowth ? '10%' : '8%',
+          grid: { color: 'rgba(128, 128, 128, 0.05)', drawTicks: false },
+          border: { display: false },
+          ticks: {
+            color: 'rgba(128, 128, 128, 0.5)',
+            font: { family: "'Outfit', sans-serif", size: 9, weight: 400 },
+            padding: 10,
+            callback: (val: any) => {
+              if (isGrowth) return `${val > 0 ? '+' : ''}${val}%`;
+              return metric === 'marketShare' ? `${val}%` : val.toLocaleString();
+            }
+          }
         }
       }
-    },
-    scales: {
-      x: {
-        grid: { display: false },
-        ticks: {
-          color: 'rgba(128, 128, 128, 0.5)',
-          font: { family: "var(--font-geologica)", size: 9, weight: 400 },
-          maxRotation: 0,
-          autoSkip: true,
-          maxTicksLimit: 7,
-          padding: 10
-        }
-      },
-      y: {
-        grid: { color: 'rgba(128, 128, 128, 0.05)', drawTicks: false },
-        border: { display: false },
-        ticks: {
-          color: 'rgba(128, 128, 128, 0.5)',
-          font: { family: "'Outfit', sans-serif", size: 9, weight: 400 },
-          padding: 10,
-          callback: (val: any) => metric === 'marketShare' ? `${val}%` : val.toLocaleString()
-        }
-      }
-    }
-  };
+    };
+  }, [metric, displayMode]);
 
   const currentTechs = useMemo(() => 
     Object.keys(techRankings)
@@ -415,28 +451,60 @@ export default function DashboardContainer() {
                   ))}
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap items-center">
                 {chartType === 'line' && (
-                  <div className="hidden sm:flex border border-border p-0.5 bg-muted/20 rounded-sm">
-                    {[7, 30, 90].map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setPeriod(p as Period)}
-                        className={cn(
-                          "relative px-4 md:px-8 py-1.5 md:py-2 text-[9px] font-medium uppercase tracking-[0.2em] transition-all duration-300 rounded-sm",
-                          period === p ? "text-background" : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
-                        )}
-                      >
-                        {period === p && (
-                          <motion.div
-                            layoutId="period-bg"
-                            className="absolute inset-0 bg-foreground rounded-sm shadow-lg"
-                            transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
-                          />
-                        )}
-                        <span className="relative z-10">{p}D</span>
-                      </button>
-                    ))}
+                  <div className="flex items-center gap-2">
+                    {/* Display Mode Switcher */}
+                    <div className="flex items-center border border-border p-0.5 bg-muted/10 rounded-sm overflow-hidden">
+                      <div className="hidden xl:flex items-center px-2 text-[7px] font-mono select-none uppercase border-r border-border/50 mr-0.5 text-muted-foreground leading-none self-stretch">
+                        [MODE]:
+                      </div>
+                      {([
+                        { id: 'absolute', label: 'Standard' },
+                        { id: 'growth', label: 'Growth %' },
+                      ] as { id: DisplayMode; label: string }[]).map((mode) => (
+                        <button
+                          key={mode.id}
+                          onClick={() => setDisplayMode(mode.id)}
+                          className={cn(
+                            "relative px-2.5 md:px-3 py-1 text-[8px] font-medium uppercase tracking-wider transition-all duration-300 rounded-xs flex items-center justify-center",
+                            displayMode === mode.id ? "text-background" : "text-muted-foreground hover:bg-muted/50"
+                          )}
+                        >
+                          {displayMode === mode.id && (
+                            <motion.div
+                              layoutId="mode-bg"
+                              className="absolute inset-0 bg-foreground rounded-xs"
+                              transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
+                            />
+                          )}
+                          <span className="relative z-10 leading-none">{mode.label}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Period Switcher */}
+                    <div className="hidden sm:flex border border-border p-0.5 bg-muted/20 rounded-sm">
+                      {[7, 30, 90].map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => setPeriod(p as Period)}
+                          className={cn(
+                            "relative px-3 md:px-5 py-1 text-[8px] font-medium uppercase tracking-[0.15em] transition-all duration-300 rounded-sm",
+                            period === p ? "text-background" : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                          )}
+                        >
+                          {period === p && (
+                            <motion.div
+                              layoutId="period-bg"
+                              className="absolute inset-0 bg-foreground rounded-sm shadow-lg"
+                              transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
+                            />
+                          )}
+                          <span className="relative z-10">{p}D</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
                 <div className="flex border border-border p-0.5 bg-muted/20 rounded-sm shrink-0">
