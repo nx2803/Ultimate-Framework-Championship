@@ -30,11 +30,32 @@ public class LLMService {
     );
 
     /**
+     * Hugging Face Space가 Sleep 모드로 들어가지 않도록 가벼운 Health Check Ping을 보냅니다.
+     */
+    public boolean ping() {
+        String url = UriComponentsBuilder.fromUriString(llmBaseUrl)
+                .path("/monitoring/health")
+                .toUriString();
+
+        try {
+            restTemplate.getForObject(url, String.class);
+            log.info("Successfully sent Keep-Alive ping to Hugging Face LLM Space ({})", url);
+            return true;
+        } catch (Exception e) {
+            log.warn("Failed to ping Hugging Face LLM Space (Possible Cold Start in progress): {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
      * 모든 카테고리에 대해 LLM 분석을 요청합니다.
      */
     @Async
     public void analyzeAllCategories() {
         log.info("Starting LLM analysis for all categories with 20s interval to honor API limits...");
+
+        // HF Space Warm-up 사전 실행
+        ping();
 
         long totalTechs = techListRepository.count();
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
